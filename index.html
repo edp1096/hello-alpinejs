@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <div x-data="initializeCounter()">
+    <div x-data="initCounter()">
         <h2 x-text="count" x-ref="counting"></h2>
 
         <button @click="count++">Increment</button>
@@ -19,7 +19,7 @@
 </body>
 
 <script>
-    function initializeCounter() {
+    function initCounter() {
         return {
             count: 0,
             init() {
