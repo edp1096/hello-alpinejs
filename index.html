@@ -1,0 +1,35 @@
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Hello alpine.js</title>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body>
+    <div x-data="initializeCounter()">
+        <h2 x-text="count" x-ref="counting"></h2>
+
+        <button @click="count++">Increment</button>
+        <button @click="count--">Decrement</button>
+    </div>
+</body>
+
+<script>
+    function initializeCounter() {
+        return {
+            count: 0,
+            init() {
+                const counting = this.$refs.counting
+                if (counting.innerText.trim() != '') {
+                    this.count = parseInt(counting.innerText)
+                }
+            }
+        }
+    }
+</script>
+
+</html>
