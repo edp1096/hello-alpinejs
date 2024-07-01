@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendar</title>
+    <link rel="icon" href="data:,">
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -15,12 +16,12 @@
 <body>
     <h1>Alpine.js Calendar Component</h1>
 
-    <button onclick="changeAvailableDates()">Change availableDates</button>
-
     <div x-data="calendar_module" id="calendar-container">
-        <label>Selection mode:</label>
-        <!-- <select x-model="selectMode" @change="clearSelection()"> -->
-        <select x-model="selectMode">
+        <button onclick="changeAvailableDates()">Change availableDates</button>
+        <br>
+
+        <label for="selection-mode">Selection mode:</label>
+        <select x-model="selectMode" id="selection-mode">
             <option value="single" selected>Single</option>
             <option value="multiple">Multiple</option>
         </select>
@@ -109,8 +110,8 @@
             </tbody>
         </table>
         <!-- Calendar End -->
-
     </div>
+
 </body>
 
 <script>
@@ -125,7 +126,7 @@
     // const selectMode = "multiple"
 
 
-    function createDates() {
+    function createRandomAvailableDates() {
         const today = new Date()
         const year = today.getFullYear()
         const month = today.getMonth()
@@ -156,10 +157,11 @@
             availableDates = availableDatesEmpty
         } else {
             // availableDates = availableDatesSomeDates
-            availableDates = createDates()
+            availableDates = createRandomAvailableDates()
         }
 
         const calendarModule = Alpine.$data(document.querySelector("#calendar-container"))
+        calendarModule.clearSelection()
         calendarModule.setAvailables(availableDates)
 
         alert("Available dates change: " + JSON.stringify(availableDates))
