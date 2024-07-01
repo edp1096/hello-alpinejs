@@ -139,7 +139,7 @@ function getIsSunday(day) {
 }
 
 
-const CalendarController = (initialYear, initialMonth) => {
+const CalendarEntryController = (initialYear, initialMonth) => {
     const timestamp = new Date()
     const year = (initialYear ?? timestamp.getFullYear())
     const month = (initialMonth ?? timestamp.getMonth())
@@ -179,7 +179,7 @@ const CalendarController = (initialYear, initialMonth) => {
     return objectData
 }
 
-const CalendarAppController = () => {
+const CalendarModuleController = () => {
     const objectData = {
         selectedEntry: null,
         availables: [],
@@ -213,6 +213,6 @@ const CalendarAppController = () => {
 }
 
 document.addEventListener("alpine:init", () => {
-    Alpine.data("calendar_app", CalendarAppController)
-    Alpine.data("calendar_entry", CalendarController)
+    Alpine.data("calendar_module", CalendarModuleController)
+    Alpine.data("calendar_entry", CalendarEntryController)
 })
