@@ -90,7 +90,7 @@ function buildGrid(entries) {
         grid.entries.push(buildEntry(entry.year, entry.month, (entry.date + 1), OTHER_MONTH))
     }
 
-    // Slice the full list of entries into weeks (for easier rendering).
+    // Slice each entries as array per weeks
     for (let i = 0; i < grid.entries.length; i += 7) {
         grid.weeks.push(grid.entries.slice(i, (i + 7)))
     }
