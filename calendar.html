@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+
+    <script defer type="text/javascript" src="calendar.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="calendar.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body>
+    <h1>Alpine.js Calendar Component</h1>
+
+    <div x-data="app">
+        <template x-if="!selectedEntry">
+            <p>Please select date.</p>
+        </template>
+
+        <template x-if="selectedEntry">
+            <p>
+                Selected date:
+                <strong>
+                    <span x-text="selectedEntry.monthName"></span>
+                    <span x-text="selectedEntry.date"></span>,
+                    <span x-text="selectedEntry.year"></span>
+                </strong>
+                <template x-if="selectedEntry.isToday">
+                    <span>( that's today! )</span>
+                </template>
+                <button @click="selectEntry(null)">Clear</button>
+            </p>
+        </template>
+
+        <p class="jumper">
+            <strong>Jump to:</strong>
+            <button @click="resetCalendar">Now</button>
+            <button @click="jumpToYear( 2023 )">2023</button>
+            <button @click="jumpToYear( 2024 )">2024</button>
+            <button @click="jumpToYear( 2025 )">2025</button>
+            <button @click="jumpToYear( 2026 )">2026</button>
+            <button @click="jumpToYear( 2027 )">2027</button>
+        </p>
+
+        <!-- Calendar Begin -->
+        <table x-data="calendar" class="calendar">
+            <thead>
+                <tr>
+                    <th colspan="7">
+                        <div class="tools">
+                            <!-- Previous month -->
+                            <button @click="gotoPrevMonth()">&larr;</button>
+
+                            <span x-text="monthName"></span>
+                            <span x-text="year"></span>
+
+                            <!-- Next month -->
+                            <button @click="gotoNextMonth()">&rarr;</button>
+                        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <template x-for="header in grid.headersAbbreviated" :key="header">
+                        <th scope="col" x-text="header">
+                        </th>
+                    </template>
+                </tr>
+            </thead>
+
+            <tbody>
+                <template x-for="( week, i ) in grid.weeks" :key="i">
+                    <tr>
+                        <template x-for="entry in week" :key="entry.id">
+                            <td>
+                                <button @click="selectEntry( entry )" :class="{
+                                    current: entry.isCurrentMonth,
+                                    other: entry.isOtherMonth,
+                                    today: entry.isToday,
+                                    weekday: entry.isWeekday,
+                                    weekend: entry.isWeekend,
+                                    selected: ( selectedEntry?.id == entry.id )
+                                }" x-text="entry.date">
+                                </button>
+                            </td>
+                        </template>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+        <!-- Calendar End -->
+    </div>
+</body>
+
+<script>
+    document.addEventListener(
+        "alpine:init",
+        function setupAlpineBindings() {
+            Alpine.data("app", AppController)
+        }
+    )
+
+    function AppController() {
+        return {
+            selectedEntry: null,
+            jumpToYear: jumpToYear,
+            resetCalendar: resetCalendar,
+            selectEntry: selectEntry
+        }
+
+        function jumpToYear(year) {
+            getCalendarController().gotoYear(year)
+        }
+
+        function resetCalendar() {
+            getCalendarController().gotoNow()
+        }
+
+        function selectEntry(entry) {
+            // Special case: toggling off currently selected entry.
+            if (entry && this.selectedEntry && (this.selectedEntry.id == entry.id)) {
+                this.selectedEntry = null
+                return
+            }
+
+            this.selectedEntry = entry
+        }
+
+        function getCalendarController() {
+            return Alpine.$data(document.querySelector(".calendar"))
+        }
+    }
+</script>
+
+</html>
