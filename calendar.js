@@ -236,7 +236,7 @@ const CalendarModuleController = () => {
         },
         getCalendarDataObject() { return Alpine.$data(document.querySelector(this.calendarEntryElementQueryName)) },
         jumpToYear(year) { this.getCalendarDataObject().gotoYear(year) },
-        jumpToYearMonth(year) { this.getCalendarDataObject().gotoYear(year, this.getCalendarDataObject().month) },
+        jumpToYearCurrentMonth(year) { this.getCalendarDataObject().gotoYear(year, this.getCalendarDataObject().month) },
         resetCalendar() { this.getCalendarDataObject().gotoToday() },
         isSelected(entry) {
             let result = false

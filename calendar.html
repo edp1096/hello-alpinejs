@@ -56,7 +56,7 @@
             <strong>Jump to:</strong>
             <button @click="resetCalendar">Today</button>
             <template x-for="(_, index) in Array(4).fill(null)" :key="index">
-                <button @click="jumpToYearMonth(getToday().year+index)" x-text="getToday().year+index"></button>
+                <button @click="jumpToYearCurrentMonth(getToday().year+index)" x-text="getToday().year+index"></button>
             </template>
         </p>
 
