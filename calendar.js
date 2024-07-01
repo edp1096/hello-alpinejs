@@ -138,6 +138,19 @@ function getIsSunday(day) {
     return (day == 0)
 }
 
+function getYMD(year, month, date) {
+    month = (month + 1).toString().padStart(2, '0')
+    date = date.toString().padStart(2, '0')
+    const ymd = `${year}-${month}-${date}`
+
+    return ymd
+}
+
+function getYmdFromEntry(entry) {
+    const ymd = getYMD(entry.year, entry.month, entry.date)
+    return ymd
+}
+
 
 const CalendarEntryController = (initialYear, initialMonth) => {
     const timestamp = new Date()
@@ -181,12 +194,18 @@ const CalendarEntryController = (initialYear, initialMonth) => {
 
 const CalendarModuleController = () => {
     const objectData = {
+        selectMode: "single",
         selectedEntry: null,
+        selectedDate: null,
+        selectedDates: [],
         availables: [],
+        calendarElementName: ".calendar",
 
+        setSelectMode(mode) { this.selectMode = mode },
         setAvailables(availables) { this.availables = availables },
         getAvailable(entry) {
-            if (!this.availables || this.availables.length == 0) { return true } // always available if empty
+            // always available if empty
+            if (!this.availables || this.availables.length == 0) { return true }
 
             const year = entry.year
             const month = (entry.month + 1).toString().padStart(2, '0')
@@ -195,17 +214,115 @@ const CalendarModuleController = () => {
 
             return this.availables.includes(ymd)
         },
-        getCalendarDataObject() { return Alpine.$data(document.querySelector(".calendar")) },
+        getCalendarDataObject() { return Alpine.$data(document.querySelector(this.calendarElementName)) },
         jumpToYear(year) { this.getCalendarDataObject().gotoYear(year) },
         resetCalendar() { this.getCalendarDataObject().gotoToday() },
-        selectEntry(entry) {
-            // Toggle same entry
-            if (entry && this.selectedEntry && (this.selectedEntry.id == entry.id)) {
-                this.selectedEntry = null
-                return
+        isSelected(entry) {
+            let result = false
+
+            switch (this.selectMode) {
+                case "single":
+                    result = this.selectedEntry?.id == entry.id
+                    break
+                case "multiple":
+                    const ymd = getYmdFromEntry(entry)
+
+                    if (this.selectedDates.length == 1) {
+                        result = this.selectedDates.includes(ymd)
+                    } else if (this.selectedDates.length == 2) {
+                        s1 = this.selectedDates[0]
+                        s2 = this.selectedDates[1]
+
+                        for (let date1 = new Date(s1); date1 <= new Date(s2); date1.setDate(date1.getDate() + 1)) {
+                            const ymd1 = getYMD(date1.getFullYear(), date1.getMonth(), date1.getDate())
+                            if (ymd == ymd1) {
+                                result = true
+                                break
+                            }
+                        }
+                    }
+                    break
             }
 
-            this.selectedEntry = entry
+            return result
+        },
+        selectEntry(entry = null) {
+            switch (this.selectMode) {
+                case "single":
+                    this.selectedEntry = entry
+                    if (entry && this.selectedEntry && this.selectedEntry.id == entry.id) {
+                        this.selectedEntry = null // Toggle same entry
+                        return
+                    }
+
+                    this.selectedDate = null
+                    if (this.selectedEntry) { this.selectedDate = getYmdFromEntry(this.selectedEntry) }
+                    break
+                case "multiple":
+                    if (entry == null) {
+                        this.selectedDates = []
+                        return
+                    }
+
+                    let s1, s2
+                    const ymd = getYmdFromEntry(entry)
+
+                    if (this.selectedDates.includes(ymd)) {
+                        this.selectedDates = this.selectedDates.filter((item) => item != ymd)
+                        return
+                    }
+
+                    if (this.selectedDates.length == 1) {
+                        s1 = new Date(this.selectedDates[0])
+                        const ymd1 = new Date(ymd)
+
+                        if (ymd1 < s1) {
+                            this.selectedDates.unshift(ymd)
+                        } else {
+                            this.selectedDates.push(ymd)
+                        }
+                    } else if (this.selectedDates.length == 2) {
+                        s1 = new Date(this.selectedDates[0])
+                        // s2 = new Date(this.selectedDates[1])
+                        const ymd1 = new Date(ymd)
+
+                        if (ymd1 < s1) {
+                            this.selectedDates[0] = ymd
+                        } else {
+                            this.selectedDates[1] = ymd
+                        }
+                    } else {
+                        this.selectedDates = []
+                        this.selectedDates.push(ymd)
+                    }
+
+                    if (this.selectedDates.length > 1) {
+                        s1 = this.selectedDates[0]
+                        s2 = this.selectedDates[1]
+                        for (let date1 = new Date(s1); date1 <= new Date(s2); date1.setDate(date1.getDate() + 1)) {
+                            const ymd = getYMD(date1.getFullYear(), date1.getMonth(), date1.getDate())
+                            if (this.availables.length > 0 && !this.availables.includes(ymd)) {
+                                this.selectedDates = []
+                                return false
+                            }
+                        }
+                    }
+
+                    break
+            }
+        },
+        getSelection() {
+            result = null
+            switch (this.selectMode) {
+                case "single":
+                    result = this.selectedEntry
+                    break
+                case "multiple":
+                    result = this.selectedDates
+                    break
+            }
+
+            return result
         }
     }
 

@@ -16,7 +16,7 @@
     <h1>Alpine.js Calendar Component</h1>
 
     <div x-data="calendar_module" id="calendar-container">
-        <template x-if="!selectedEntry">
+        <template x-if="!selectedEntry && selectedDates.length == 0">
             <p>Please select date.</p>
         </template>
 
@@ -24,13 +24,26 @@
             <p>
                 Selected date:
                 <strong>
-                    <span x-text="selectedEntry.monthName"></span>
+                    <!-- <span x-text="selectedEntry.monthName"></span>
                     <span x-text="selectedEntry.date"></span>,
-                    <span x-text="selectedEntry.year"></span>
+                    <span x-text="selectedEntry.year"></span> -->
+                    <span x-text="selectedDate"></span>
                 </strong>
                 <template x-if="selectedEntry.isToday">
-                    <span>( that's today! )</span>
+                    <span>(Today!)</span>
                 </template>
+                <button @click="selectEntry(null)">Clear</button>
+            </p>
+        </template>
+
+        <template x-if="selectedDates.length > 0">
+            <p>
+                Selected dates:
+                <strong>
+                    <span x-text="selectedDates[0]"></span>
+                    ~
+                    <span x-text="selectedDates[1]"></span>
+                </strong>
                 <button @click="selectEntry(null)">Clear</button>
             </p>
         </template>
@@ -81,9 +94,10 @@
                                     weekday: entry.isWeekday,
                                     saturday: entry.isSaturday,
                                     sunday: entry.isSunday,
-                                    selected: (selectedEntry?.id == entry.id)
+                                    selected: isSelected(entry)
                                 }" :disabled="!getAvailable(entry)" x-text="entry.date">
-                                    <!-- }" x-text="entry.date"> -->
+                                    <!-- selected: (selectedEntry?.id == entry.id)
+                                }" :disabled="!getAvailable(entry)" x-text="entry.date"> -->
                                 </button>
                             </td>
                         </template>
@@ -100,11 +114,19 @@
     let availableDates = [
         "2024-07-05", "2024-07-06", "2024-07-07", "2024-07-08", "2024-07-09", "2024-07-10",
         "2024-07-11", "2024-07-12", "2024-07-13", "2024-07-14", "2024-07-15", "2024-07-16",
-        "2024-07-17", "2024-07-18", "2024-07-19", "2024-07-20", "2024-07-21", "2024-07-22",
+        "2024-07-17", "2024-07-19", "2024-07-20", "2024-07-21", "2024-07-22", "2024-07-23",
+        "2024-07-24", "2024-07-25", "2024-07-26", "2024-07-27", "2024-07-28", "2024-07-29",
+        "2024-07-30", "2024-07-31", "2024-08-01", "2024-08-02", "2024-08-03", "2024-08-05"
     ]
+    // let availableDates = []
+
+    const selectMode = "single"
+    // const selectMode = "multiple"
 
     document.addEventListener('alpine:initialized', () => {
-        Alpine.$data(document.querySelector("#calendar-container")).setAvailables(availableDates)
+        const calendarModule = Alpine.$data(document.querySelector("#calendar-container"))
+        calendarModule.setAvailables(availableDates)
+        calendarModule.setSelectMode(selectMode)
     })
 </script>
 

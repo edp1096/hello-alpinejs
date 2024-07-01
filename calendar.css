@@ -48,8 +48,9 @@
 
 .calendar tbody td button.selected,
 .calendar tbody td button:hover {
-    outline: 3px solid #009fff;
-    outline-offset: -3px;
+    background-color: #fdd881;
+    /* outline: 3px solid #009fff;
+    outline-offset: -3px; */
 }
 
 .calendar .tools {
