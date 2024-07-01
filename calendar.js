@@ -201,6 +201,7 @@ const CalendarModuleController = () => {
         availables: [],
         calendarEntryElementQueryName: ".calendar",
 
+        init() { this.$watch("selectMode", () => { this.clearSelection() }) },
         getToday() {
             const now = new Date();
             const year = now.getFullYear();
@@ -214,6 +215,11 @@ const CalendarModuleController = () => {
             }
 
             return result
+        },
+        clearSelection() {
+            this.selectedEntry = null
+            this.selectedDate = null
+            this.selectedDates = []
         },
         setSelectMode(mode) { this.selectMode = mode },
         setAvailables(availables) { this.availables = availables },

@@ -15,7 +15,16 @@
 <body>
     <h1>Alpine.js Calendar Component</h1>
 
+    <button onclick="changeAvailableDates()">Change availableDates</button>
+
     <div x-data="calendar_module" id="calendar-container">
+        <label>Selection mode:</label>
+        <!-- <select x-model="selectMode" @change="clearSelection()"> -->
+        <select x-model="selectMode">
+            <option value="single" selected>Single</option>
+            <option value="multiple">Multiple</option>
+        </select>
+
         <template x-if="!selectedEntry && selectedDates.length == 0">
             <p>Please select date.</p>
         </template>
@@ -105,17 +114,56 @@
 </body>
 
 <script>
-    // let availableDates = [
-    //     "2024-07-05", "2024-07-06", "2024-07-07", "2024-07-08", "2024-07-09", "2024-07-10",
+    // const availableDatesSomeDates = [
     //     "2024-07-11", "2024-07-12", "2024-07-13", "2024-07-14", "2024-07-15", "2024-07-16",
-    //     "2024-07-17", "2024-07-19", "2024-07-20", "2024-07-21", "2024-07-22", "2024-07-23",
-    //     "2024-07-24", "2024-07-25", "2024-07-26", "2024-07-27", "2024-07-28", "2024-07-29",
-    //     "2024-07-30", "2024-07-31", "2024-08-01", "2024-08-02", "2024-08-03", "2024-08-05"
+    //     "2024-07-17", "2024-07-19", "2024-07-20", "2024-07-21", "2024-07-22", "2024-07-23"
     // ]
+    const availableDatesEmpty = []
     let availableDates = []
 
     const selectMode = "single"
     // const selectMode = "multiple"
+
+
+    function createDates() {
+        const today = new Date()
+        const year = today.getFullYear()
+        const month = today.getMonth()
+
+        const startDate = new Date(year, month, 1)
+        const endDate = new Date(year, month + 2, 0)
+
+        const allDates = []
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0')
+            const day = String(d.getDate()).padStart(2, '0')
+            allDates.push(`${y}-${m}-${day}`)
+        }
+
+        const availableDates = [...allDates]
+        const numDatesToRemove = Math.floor(Math.random() * (allDates.length / 2))
+        for (let i = 0; i < numDatesToRemove; i++) {
+            const randomIndex = Math.floor(Math.random() * availableDates.length)
+            availableDates.splice(randomIndex, 1)
+        }
+
+        return availableDates
+    }
+
+    function changeAvailableDates() {
+        if (availableDates.length > 0) {
+            availableDates = availableDatesEmpty
+        } else {
+            // availableDates = availableDatesSomeDates
+            availableDates = createDates()
+        }
+
+        const calendarModule = Alpine.$data(document.querySelector("#calendar-container"))
+        calendarModule.setAvailables(availableDates)
+
+        alert("Available dates change: " + JSON.stringify(availableDates))
+    }
 
     document.addEventListener('alpine:initialized', () => {
         const calendarModule = Alpine.$data(document.querySelector("#calendar-container"))
