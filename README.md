@@ -1,4 +1,4 @@
-[alpine.js](https://alpinejs.dev) 찍먹
+[alpine.js](https://alpinejs.dev) 찍먹 - https://edp1096.github.io/hello-alpinejs
 
 * x-data : 컨테이너에 삽입되는 렌더링용 데이터
 * x-ref : `$ref.변수`. 단일 변수만, 배열형태 안됨
