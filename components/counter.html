@@ -1,0 +1,20 @@
+<div x-data="dataCounter()">
+    <button @click="count++">Increment</button>
+    <button @click="count--">Decrement</button>
+
+    <h2 x-text="count" x-ref="counting">10</h2>
+</div>
+
+<script>
+    const dataCounter = () => {
+        const initializerCount = {
+            count: 0,
+            init() {
+                const counting = this.$refs.counting
+                if (counting.innerText.trim() != '') { this.count = parseInt(counting.innerText) }
+            }
+        }
+
+        return initializerCount
+    }
+</script>

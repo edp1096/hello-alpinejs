@@ -1,0 +1,13 @@
+<div>
+    <h1 id="component-title">Hello, World!</h1>
+    <p>This content is loaded from an external HTML file.</p>
+</div>
+
+<script>
+    const shroot = document.querySelector("custom-element").shadowRoot
+
+    console.log('This is script in content.html')
+    shroot.querySelector("#component-title").style.color = "blue"
+</script>
+
+<script src="/components/console.js"></script>

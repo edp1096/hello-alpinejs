@@ -1,0 +1,44 @@
+<!-- 투두 -->
+<div x-data="dataTodos" x-init="init()">
+    <button @click="addTodo()">Add Todo</button>
+    <button @click="removeTodo()">Remove Todo</button>
+
+    <ul>
+        <li is-static x-ref="todoItem">Todo 1</li>
+        <li is-static x-ref="todoItem">Todo 2</li>
+
+        <template x-if="todos.length > 0">
+            <template x-for="(todo, index) in todos" :key="index">
+                <li x-text="todo"></li>
+            </template>
+        </template>
+    </ul>
+</div>
+
+<script>
+    const dataTodos = () => {
+        const initializerTodo = {
+            todos: [],
+            init() {
+                const todoItems = this.$refs.todoItem
+                if (!todoItems || !todoItems.parentNode) { return false }
+
+                for (const todo of todoItems.parentNode.children) {
+                    if (todo.hasAttribute('is-static')) {
+                        this.todos.push(todo.innerText)
+                        todo.remove()
+                    }
+                }
+            },
+            addTodo() {
+                const newTodo = `Todo ${this.todos.length + 1}`
+                this.todos.push(newTodo)
+            },
+            removeTodo() {
+                if (this.todos.length > 0) { this.todos.pop() }
+            }
+        }
+
+        return initializerTodo
+    }
+</script>
