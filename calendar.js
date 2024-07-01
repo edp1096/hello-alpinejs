@@ -199,8 +199,22 @@ const CalendarModuleController = () => {
         selectedDate: null,
         selectedDates: [],
         availables: [],
-        calendarElementName: ".calendar",
+        calendarEntryElementQueryName: ".calendar",
 
+        getToday() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+
+            const result = {
+                year: year,
+                month: month,
+                date: date
+            }
+
+            return result
+        },
         setSelectMode(mode) { this.selectMode = mode },
         setAvailables(availables) { this.availables = availables },
         getAvailable(entry) {
@@ -214,8 +228,9 @@ const CalendarModuleController = () => {
 
             return this.availables.includes(ymd)
         },
-        getCalendarDataObject() { return Alpine.$data(document.querySelector(this.calendarElementName)) },
+        getCalendarDataObject() { return Alpine.$data(document.querySelector(this.calendarEntryElementQueryName)) },
         jumpToYear(year) { this.getCalendarDataObject().gotoYear(year) },
+        jumpToYearMonth(year) { this.getCalendarDataObject().gotoYear(year, this.getCalendarDataObject().month) },
         resetCalendar() { this.getCalendarDataObject().gotoToday() },
         isSelected(entry) {
             let result = false

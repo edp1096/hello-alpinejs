@@ -23,12 +23,7 @@
         <template x-if="selectedEntry">
             <p>
                 Selected date:
-                <strong>
-                    <!-- <span x-text="selectedEntry.monthName"></span>
-                    <span x-text="selectedEntry.date"></span>,
-                    <span x-text="selectedEntry.year"></span> -->
-                    <span x-text="selectedDate"></span>
-                </strong>
+                <strong><span x-text="selectedDate"></span></strong>
                 <template x-if="selectedEntry.isToday">
                     <span>(Today!)</span>
                 </template>
@@ -51,10 +46,9 @@
         <p class="jumper">
             <strong>Jump to:</strong>
             <button @click="resetCalendar">Today</button>
-            <button @click="jumpToYear(2023)">2023</button>
-            <button @click="jumpToYear(2024)">2024</button>
-            <button @click="jumpToYear(2025)">2025</button>
-            <button @click="jumpToYear(2026)">2026</button>
+            <template x-for="(_, index) in Array(4).fill(null)" :key="index">
+                <button @click="jumpToYearMonth(getToday().year+index)" x-text="getToday().year+index"></button>
+            </template>
         </p>
 
         <!-- Calendar Begin -->
@@ -111,14 +105,14 @@
 </body>
 
 <script>
-    let availableDates = [
-        "2024-07-05", "2024-07-06", "2024-07-07", "2024-07-08", "2024-07-09", "2024-07-10",
-        "2024-07-11", "2024-07-12", "2024-07-13", "2024-07-14", "2024-07-15", "2024-07-16",
-        "2024-07-17", "2024-07-19", "2024-07-20", "2024-07-21", "2024-07-22", "2024-07-23",
-        "2024-07-24", "2024-07-25", "2024-07-26", "2024-07-27", "2024-07-28", "2024-07-29",
-        "2024-07-30", "2024-07-31", "2024-08-01", "2024-08-02", "2024-08-03", "2024-08-05"
-    ]
-    // let availableDates = []
+    // let availableDates = [
+    //     "2024-07-05", "2024-07-06", "2024-07-07", "2024-07-08", "2024-07-09", "2024-07-10",
+    //     "2024-07-11", "2024-07-12", "2024-07-13", "2024-07-14", "2024-07-15", "2024-07-16",
+    //     "2024-07-17", "2024-07-19", "2024-07-20", "2024-07-21", "2024-07-22", "2024-07-23",
+    //     "2024-07-24", "2024-07-25", "2024-07-26", "2024-07-27", "2024-07-28", "2024-07-29",
+    //     "2024-07-30", "2024-07-31", "2024-08-01", "2024-08-02", "2024-08-03", "2024-08-05"
+    // ]
+    let availableDates = []
 
     const selectMode = "single"
     // const selectMode = "multiple"
