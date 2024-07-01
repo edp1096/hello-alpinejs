@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendar</title>
 
-    <script defer type="text/javascript" src="calendar.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="calendar.css" />
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script type="text/javascript" src="calendar.js"></script>
 </head>
 
 <body>
     <h1>Alpine.js Calendar Component</h1>
 
-    <div x-data="app">
+    <div x-data="calendar_app" id="calendar-container">
         <template x-if="!selectedEntry">
             <p>Please select date.</p>
         </template>
@@ -37,16 +37,15 @@
 
         <p class="jumper">
             <strong>Jump to:</strong>
-            <button @click="resetCalendar">Now</button>
+            <button @click="resetCalendar">Today</button>
             <button @click="jumpToYear( 2023 )">2023</button>
             <button @click="jumpToYear( 2024 )">2024</button>
             <button @click="jumpToYear( 2025 )">2025</button>
             <button @click="jumpToYear( 2026 )">2026</button>
-            <button @click="jumpToYear( 2027 )">2027</button>
         </p>
 
         <!-- Calendar Begin -->
-        <table x-data="calendar" class="calendar">
+        <table x-data="calendar_entry" class="calendar">
             <thead>
                 <tr>
                     <th colspan="7">
@@ -71,18 +70,20 @@
             </thead>
 
             <tbody>
-                <template x-for="( week, i ) in grid.weeks" :key="i">
+                <template x-for="(week, i) in grid.weeks" :key="i">
                     <tr>
                         <template x-for="entry in week" :key="entry.id">
                             <td>
-                                <button @click="selectEntry( entry )" :class="{
+                                <button @click="selectEntry(entry)" :class="{
                                     current: entry.isCurrentMonth,
                                     other: entry.isOtherMonth,
                                     today: entry.isToday,
                                     weekday: entry.isWeekday,
-                                    weekend: entry.isWeekend,
-                                    selected: ( selectedEntry?.id == entry.id )
-                                }" x-text="entry.date">
+                                    saturday: entry.isSaturday,
+                                    sunday: entry.isSunday,
+                                    selected: (selectedEntry?.id == entry.id)
+                                }" :disabled="!getAvailable(entry)" x-text="entry.date">
+                                    <!-- }" x-text="entry.date"> -->
                                 </button>
                             </td>
                         </template>
@@ -91,47 +92,20 @@
             </tbody>
         </table>
         <!-- Calendar End -->
+
     </div>
 </body>
 
 <script>
-    document.addEventListener(
-        "alpine:init",
-        function setupAlpineBindings() {
-            Alpine.data("app", AppController)
-        }
-    )
+    let availableDates = [
+        "2024-07-05", "2024-07-06", "2024-07-07", "2024-07-08", "2024-07-09", "2024-07-10",
+        "2024-07-11", "2024-07-12", "2024-07-13", "2024-07-14", "2024-07-15", "2024-07-16",
+        "2024-07-17", "2024-07-18", "2024-07-19", "2024-07-20", "2024-07-21", "2024-07-22",
+    ]
 
-    function AppController() {
-        return {
-            selectedEntry: null,
-            jumpToYear: jumpToYear,
-            resetCalendar: resetCalendar,
-            selectEntry: selectEntry
-        }
-
-        function jumpToYear(year) {
-            getCalendarController().gotoYear(year)
-        }
-
-        function resetCalendar() {
-            getCalendarController().gotoNow()
-        }
-
-        function selectEntry(entry) {
-            // Special case: toggling off currently selected entry.
-            if (entry && this.selectedEntry && (this.selectedEntry.id == entry.id)) {
-                this.selectedEntry = null
-                return
-            }
-
-            this.selectedEntry = entry
-        }
-
-        function getCalendarController() {
-            return Alpine.$data(document.querySelector(".calendar"))
-        }
-    }
+    document.addEventListener('alpine:initialized', () => {
+        Alpine.$data(document.querySelector("#calendar-container")).setAvailables(availableDates)
+    })
 </script>
 
 </html>

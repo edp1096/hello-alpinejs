@@ -1,14 +1,3 @@
-html {
-    font-size: 140%;
-}
-
-body,
-button {
-    font-family: monospace;
-    font-size: inherit;
-    line-height: inherit;
-}
-
 .calendar {
     background-color: #ffffff;
     border: 1px solid #333333;
@@ -35,6 +24,14 @@ button {
     width: 100%;
 }
 
+.calendar tbody td button.saturday {
+    color: #4f7bcb;
+}
+
+.calendar tbody td button.sunday {
+    color: red;
+}
+
 .calendar tbody td button.other {
     background-color: #f8fdff;
 }
@@ -43,6 +40,10 @@ button {
     background-color: #0095d1;
     color: #ffffff;
     font-weight: bold;
+}
+
+.calendar tbody td button:disabled {
+    color: #bbb;
 }
 
 .calendar tbody td button.selected,
