@@ -17,7 +17,7 @@
     <script src="calendar.js"></script>
 </head>
 
-<body x-data :class="$store.darkMode.on && 'dark'">
+<body class="dark" x-data :class="$store.darkMode.on && 'dark'">
     <button x-data @click="$store.darkMode.toggle()">
         <span>Toggle Dark Mode - </span>
         <span x-text="$store.darkMode.on ? 'Dark' : 'Light'"></span>
@@ -202,6 +202,7 @@
 
 <script>
     function loadStore() {
+        document.body.classList.remove("dark")
         Alpine.store("darkMode", {
             on: true,
 
