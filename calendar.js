@@ -199,7 +199,6 @@ const CalendarModuleController = () => {
         selectedDate: null,
         selectedDates: [],
         availables: [],
-        calendarEntryElementQueryName: ".calendar",
 
         init() { this.$watch("selectMode", () => { this.clearSelection() }) },
         getToday() {
@@ -234,7 +233,7 @@ const CalendarModuleController = () => {
 
             return this.availables.includes(ymd)
         },
-        getCalendarDataObject() { return Alpine.$data(document.querySelector(this.calendarEntryElementQueryName)) },
+        getCalendarDataObject() { return Alpine.$data(this.$root.querySelector("table")) },
         jumpToYear(year) { this.getCalendarDataObject().gotoYear(year) },
         jumpToYearCurrentMonth(year) { this.getCalendarDataObject().gotoYear(year, this.getCalendarDataObject().month) },
         resetCalendar() { this.getCalendarDataObject().gotoToday() },

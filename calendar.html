@@ -111,7 +111,6 @@
         </table>
         <!-- Calendar End -->
     </div>
-
 </body>
 
 <script>
@@ -167,11 +166,11 @@
         alert("Available dates change: " + JSON.stringify(availableDates))
     }
 
-    document.addEventListener('alpine:initialized', () => {
-        const calendarModule = Alpine.$data(document.querySelector("#calendar-container"))
-        calendarModule.setAvailables(availableDates)
-        calendarModule.setSelectMode(selectMode)
-    })
+    // document.addEventListener('alpine:initialized', () => {
+    //     const calendarModule = Alpine.$data(document.querySelector("#calendar-container"))
+    //     calendarModule.setAvailables(availableDates)
+    //     calendarModule.setSelectMode(selectMode)
+    // })
 </script>
 
 </html>
