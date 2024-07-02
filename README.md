@@ -12,3 +12,5 @@
 
 
 * Calendar source - https://github.com/bennadel/JavaScript-Demos/tree/master/demos/calendar-alpinejs
+
+* Component - shadowDOM에서 js 샌드박스 안된다. 관심두지 말것.
