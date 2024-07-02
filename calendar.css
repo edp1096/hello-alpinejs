@@ -1,13 +1,19 @@
+html,
+body {
+    margin: 0.2em;
+    padding: 0;
+}
+
 .calendar {
     background-color: #ffffff;
     border: 1px solid #333333;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 0.5em 0.5em;
 }
 
 .calendar th {
     border: 1px solid #333333;
-    padding: 10px 15px;
+    padding: 0.5em 0.6em;
 }
 
 .calendar td {
@@ -15,6 +21,9 @@
     padding: 0;
 }
 
+.calendar tbody td:has(button) {
+    background-color: #bdebff;
+}
 .calendar tbody td button {
     border: none;
     background-color: #bdebff;
@@ -32,7 +41,8 @@
     color: red;
 }
 
-.calendar tbody td button.other {
+.calendar tbody td button.other,
+.calendar tbody td:has(.other) {
     background-color: #f8fdff;
 }
 

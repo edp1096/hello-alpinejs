@@ -153,27 +153,74 @@ function getYmdFromEntry(entry) {
 
 
 const CalendarEntryController = (initialYear, initialMonth) => {
+    let moreMonthCount = 1
+
     const timestamp = new Date()
     const year = (initialYear ?? timestamp.getFullYear())
     const month = (initialMonth ?? timestamp.getMonth())
-    const monthName = CALENDAR_MONTHS[month]
+    // const monthName = CALENDAR_MONTHS[month]
 
-    const entries = buildEntries(year, month)
-    const grid = buildGrid(entries)
+    // const entries = buildEntries(year, month)
+    // const grid = buildGrid(entries)
+
+
+    let years = []
+    let months = []
+    let monthNames = []
+    let grids = []
+    for (let i = 0; i < moreMonthCount; i++) {
+        const timestamp_appender = new Date(year, month + (i))
+        const years_appender = timestamp_appender.getFullYear()
+        const months_appender = timestamp_appender.getMonth()
+        const monthNames_appender = CALENDAR_MONTHS[months_appender]
+
+        years.push(years_appender)
+        months.push(months_appender)
+        monthNames.push(monthNames_appender)
+
+        const entries_appender = buildEntries(years_appender, months_appender)
+        grids.push(buildGrid(entries_appender))
+    }
 
     const objectData = {
+        moreMonthCount: moreMonthCount,
+
         year: year,
         month: month,
-        monthName: monthName,
-        entries: entries,
-        grid: grid,
+        // monthName: monthName,
+        // entries: entries,
+        // grid: grid,
 
+        years: years,
+        months: months,
+        monthNames: monthNames,
+        grids: grids,
+
+        getSelectedDate() { return new Date(this.year, this.month) },
         gotoDate(target) {
             this.year = target.getFullYear()
             this.month = target.getMonth()
             this.monthName = CALENDAR_MONTHS[this.month]
             this.entries = buildEntries(this.year, this.month)
             this.grid = buildGrid(this.entries)
+
+            this.years = []
+            this.months = []
+            this.monthNames = []
+            this.grids = []
+            for (let i = 0; i < this.moreMonthCount; i++) {
+                const timestamp_appender = new Date(this.year, this.month + i)
+                const years_appender = timestamp_appender.getFullYear()
+                const months_appender = timestamp_appender.getMonth()
+                const monthNames_appender = CALENDAR_MONTHS[months_appender]
+
+                this.years.push(years_appender)
+                this.months.push(months_appender)
+                this.monthNames.push(monthNames_appender)
+
+                const entries_appender = buildEntries(years_appender, months_appender)
+                this.grids.push(buildGrid(entries_appender))
+            }
         },
         gotoNextMonth() {
             this.gotoDate(new Date(this.year, (this.month + 1), 1))
@@ -195,6 +242,7 @@ const CalendarEntryController = (initialYear, initialMonth) => {
 const CalendarModuleController = () => {
     const objectData = {
         selectMode: "single",
+        showMode: 1,
         selectedEntry: null,
         selectedDate: null,
         selectedDates: [],
@@ -221,6 +269,12 @@ const CalendarModuleController = () => {
             this.selectedDates = []
         },
         setSelectMode(mode) { this.selectMode = mode },
+        updateShowMonthCount(count) {
+            if (count <= 0) { count = 1 }
+            this.getCalendarEntryObject().moreMonthCount = count
+            this.clearSelection()
+            this.moveToYearCurrentMonth(this.getCalendarEntryObject().year)
+        },
         setAvailables(availables) { this.availables = availables },
         getAvailable(entry) {
             // always available if empty
@@ -233,10 +287,15 @@ const CalendarModuleController = () => {
 
             return this.availables.includes(ymd)
         },
-        getCalendarDataObject() { return Alpine.$data(this.$root.querySelector("table")) },
-        jumpToYear(year) { this.getCalendarDataObject().gotoYear(year) },
-        jumpToYearCurrentMonth(year) { this.getCalendarDataObject().gotoYear(year, this.getCalendarDataObject().month) },
-        resetCalendar() { this.getCalendarDataObject().gotoToday() },
+        getCalendarEntryObject() { return Alpine.$data(this.$root.querySelector(".calendar-entry-container")) },
+        moveFromDateText(dateText) {
+            const date = new Date(dateText)
+            this.moveToYearMonth(date.getFullYear(), date.getMonth())
+        },
+        moveToYearMonth(year, month) { this.getCalendarEntryObject().gotoYear(year, month) },
+        moveToYear(year) { this.getCalendarEntryObject().gotoYear(year) },
+        moveToYearCurrentMonth(year) { this.getCalendarEntryObject().gotoYear(year, this.getCalendarEntryObject().month) },
+        resetCalendar() { this.getCalendarEntryObject().gotoToday() },
         isSelected(entry) {
             let result = false
 

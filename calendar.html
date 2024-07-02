@@ -20,11 +20,22 @@
         <button onclick="changeAvailableDates()">Change availableDates</button>
         <br>
 
-        <label for="selection-mode">Selection mode:</label>
-        <select x-model="selectMode" id="selection-mode">
-            <option value="single" selected>Single</option>
-            <option value="multiple">Multiple</option>
-        </select>
+        <p>
+            <label for="selection-mode">Selection mode:</label>
+            <select x-model="selectMode" id="selection-mode">
+                <option value="single" selected>Single</option>
+                <option value="multiple">Multiple</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="show-month-count">Show month(s) count:</label>
+            <select @change="updateShowMonthCount($event.target.value)" id="show-month-count">
+                <template x-for="(_, index) in Array(12).fill(null)" :key="index">
+                    <option :value="index+1" x-text="index+1"></option>
+                </template>
+            </select>
+        </p>
 
         <template x-if="!selectedEntry && selectedDates.length == 0">
             <p>Please select date.</p>
@@ -33,7 +44,9 @@
         <template x-if="selectedEntry">
             <p>
                 Selected date:
-                <strong><span x-text="selectedDate"></span></strong>
+                <strong>
+                    <a x-text="selectedDate" @click="moveFromDateText(selectedDate)" href="javascript:void(0);"></a>
+                </strong>
                 <template x-if="selectedEntry.isToday">
                     <span>(Today!)</span>
                 </template>
@@ -45,9 +58,9 @@
             <p>
                 Selected dates:
                 <strong>
-                    <span x-text="selectedDates[0]"></span>
+                    <a x-text="selectedDates[0]" @click="moveFromDateText(selectedDates[0])" href="javascript:void(0);"></a>
                     ~
-                    <span x-text="selectedDates[1]"></span>
+                    <a x-text="selectedDates[1]" @click="moveFromDateText(selectedDates[1])" href="javascript:void(0);"></a>
                 </strong>
                 <button @click="selectEntry(null)">Clear</button>
             </p>
@@ -56,59 +69,57 @@
         <p class="jumper">
             <strong>Jump to:</strong>
             <button @click="resetCalendar">Today</button>
-            <template x-for="(_, index) in Array(4).fill(null)" :key="index">
-                <button @click="jumpToYearCurrentMonth(getToday().year+index)" x-text="getToday().year+index"></button>
+            <template x-for="(_, index) in Array(5).fill(null)" :key="index">
+                <button @click="moveToYearCurrentMonth(getToday().year+index)" x-text="getToday().year+index"></button>
             </template>
         </p>
 
         <!-- Calendar Begin -->
-        <table x-data="calendar_entry" class="calendar">
-            <thead>
-                <tr>
-                    <th colspan="7">
-                        <div class="tools">
-                            <!-- Previous month -->
-                            <button @click="gotoPrevMonth()">&larr;</button>
+        <div x-data="calendar_entry" class="calendar-entry-container" style="display: flex; flex-wrap: wrap;">
+            <template x-for="(g, k) in grids" :key="k">
+                <table class="calendar">
+                    <thead>
+                        <tr>
+                            <th colspan="7">
+                                <div class="tools">
+                                    <button @click="gotoPrevMonth()">&larr;</button>
+                                    <span x-text="monthNames[k]"></span>
+                                    <span x-text="years[k]"></span>
+                                    <button @click="gotoNextMonth()">&rarr;</button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <template x-for="header in g.headersAbbreviated" :key="header">
+                                <th scope="col" x-text="header">
+                                </th>
+                            </template>
+                        </tr>
+                    </thead>
 
-                            <span x-text="monthName"></span>
-                            <span x-text="year"></span>
-
-                            <!-- Next month -->
-                            <button @click="gotoNextMonth()">&rarr;</button>
-                        </div>
-                    </th>
-                </tr>
-                <tr>
-                    <template x-for="header in grid.headersAbbreviated" :key="header">
-                        <th scope="col" x-text="header">
-                        </th>
-                    </template>
-                </tr>
-            </thead>
-
-            <tbody>
-                <template x-for="(week, i) in grid.weeks" :key="i">
-                    <tr>
-                        <template x-for="entry in week" :key="entry.id">
-                            <td>
-                                <button @click="selectEntry(entry)" :class="{
-                                    current: entry.isCurrentMonth,
-                                    other: entry.isOtherMonth,
-                                    today: entry.isToday,
-                                    weekday: entry.isWeekday,
-                                    saturday: entry.isSaturday,
-                                    sunday: entry.isSunday,
-                                    selected: isSelected(entry)
-                                }" :disabled="!getAvailable(entry)" x-text="entry.date">
-                                    <!-- selected: (selectedEntry?.id == entry.id)
-                                }" :disabled="!getAvailable(entry)" x-text="entry.date"> -->
-                                </button>
-                            </td>
+                    <tbody>
+                        <template x-for="(week, i) in g.weeks" :key="i">
+                            <tr>
+                                <template x-for="entry in week" :key="entry.id">
+                                    <td>
+                                        <button @click="selectEntry(entry)" :class="{
+                                            current: entry.isCurrentMonth,
+                                            other: entry.isOtherMonth,
+                                            today: entry.isToday,
+                                            weekday: entry.isWeekday,
+                                            saturday: entry.isSaturday,
+                                            sunday: entry.isSunday,
+                                            selected: isSelected(entry)
+                                        }" :disabled="!getAvailable(entry)" x-text="entry.date">
+                                        </button>
+                                    </td>
+                                </template>
+                            </tr>
                         </template>
-                    </tr>
-                </template>
-            </tbody>
-        </table>
+                    </tbody>
+                </table>
+            </template>
+        </div>
         <!-- Calendar End -->
     </div>
 </body>
@@ -166,11 +177,12 @@
         alert("Available dates change: " + JSON.stringify(availableDates))
     }
 
-    // document.addEventListener('alpine:initialized', () => {
-    //     const calendarModule = Alpine.$data(document.querySelector("#calendar-container"))
-    //     calendarModule.setAvailables(availableDates)
-    //     calendarModule.setSelectMode(selectMode)
-    // })
+    document.addEventListener('alpine:initialized', () => {
+        const calendarModule = Alpine.$data(document.querySelector("#calendar-container"))
+        calendarModule.setAvailables(availableDates)
+        calendarModule.setSelectMode(selectMode)
+        calendarModule.updateShowMonthCount(document.querySelector("#show-month-count").value)
+    })
 </script>
 
 </html>
