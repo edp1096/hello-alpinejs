@@ -203,7 +203,7 @@
 <script>
     function loadStore() {
         Alpine.store("darkMode", {
-            on: false,
+            on: true,
 
             init() { this.on = localStorage.getItem("darkMode") == "true" },
             toggle() {
