@@ -328,12 +328,14 @@ const CalendarModuleController = () => {
         selectEntry(entry = null) {
             switch (this.selectMode) {
                 case "single":
+                    // Toggle same entry
                     if (entry && this.selectedEntry && this.selectedEntry.id == entry.id) {
-                        this.selectedEntry = null // Toggle same entry
+                        this.selectedDate = null
+                        this.selectedEntry = null
                         return
                     }
-                    this.selectedEntry = entry
 
+                    this.selectedEntry = entry
                     this.selectedDate = null
                     if (this.selectedEntry) { this.selectedDate = getYmdFromEntry(this.selectedEntry) }
                     break

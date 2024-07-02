@@ -61,7 +61,7 @@
                 <template x-if="selectedEntry.isToday">
                     <span>(Today!)</span>
                 </template>
-                <button @click="selectEntry(null)">Clear</button>
+                <button @click="selectDateEntry(null, $data)">Clear</button>
             </p>
         </template>
 
@@ -73,7 +73,7 @@
                     ~
                     <a x-text="selectedDates[1]" @click="moveToSelectedDate(selectedDates[1], $data)" href="javascript:void(0);"></a>
                 </strong>
-                <button @click="selectEntry(null)">Clear</button>
+                <button @click="selectDateEntry(null, $data)">Clear</button>
             </p>
         </template>
 
@@ -113,7 +113,7 @@
                             <tr>
                                 <template x-for="entry in week" :key="entry.id">
                                     <td>
-                                        <button @click="selectEntry(entry)" :class="{
+                                        <button @click="selectDateEntry(entry, $data)" :class="{
                                             current: entry.isCurrentMonth,
                                             other: entry.isOtherMonth,
                                             today: entry.isToday,
@@ -146,6 +146,7 @@
     const selectMode = "single"
     // const selectMode = "multiple"
 
+    let selectedDates = []
 
     function createRandomAvailableDates() {
         const today = new Date()
@@ -171,6 +172,22 @@
         }
 
         return availableDates
+    }
+
+    function selectDateEntry(date, controller) {
+        controller.selectEntry(date)
+
+        selectedDates = []
+        if (!date) { return }
+
+        switch (controller.selectMode) {
+            case "single":
+                if (controller.selectedDate) { selectedDates.push(controller.selectedDate) }
+                break
+            case "multiple":
+                for (const d of controller.selectedDates) { selectedDates.push(d) }
+                break
+        }
     }
 
     function moveToSelectedDate(date, controller) {
