@@ -201,22 +201,22 @@
 </script>
 
 <script>
-    document.addEventListener('alpine:init', () => {
+    function loadStore() {
         Alpine.store("darkMode", {
             on: false,
 
-            init() {
-                this.on = localStorage.getItem("darkMode") == "true"
-            },
+            init() { this.on = localStorage.getItem("darkMode") == "true" },
             toggle() {
                 this.on = !this.on
                 localStorage.setItem('darkMode', this.on)
             }
         })
-    })
+    }
+
+    document.addEventListener('alpine:init', () => { loadStore() })
 
     globalThis.onpageshow = function (event) {
-        if (event.persisted) { window.location.reload() }
+        if (event.persisted) { loadStore() }
     }
 </script>
 
