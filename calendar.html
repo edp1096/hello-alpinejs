@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Calendar</title>
     <link rel="icon" href="data:,">
 
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-    <link rel="stylesheet" type="text/css" href="calendar.css" />
-    <script type="text/javascript" src="calendar.js"></script>
+    <link rel="stylesheet" href="calendar.css" />
+    <script src="calendar.js"></script>
 </head>
 
 <body>
@@ -45,7 +46,7 @@
             <p>
                 Selected date:
                 <strong>
-                    <a x-text="selectedDate" @click="moveFromDateText(selectedDate)" href="javascript:void(0);"></a>
+                    <a x-text="selectedDate" @click="moveToSelectedDate(selectedDate, $data)" href="javascript:void(0);"></a>
                 </strong>
                 <template x-if="selectedEntry.isToday">
                     <span>(Today!)</span>
@@ -58,9 +59,9 @@
             <p>
                 Selected dates:
                 <strong>
-                    <a x-text="selectedDates[0]" @click="moveFromDateText(selectedDates[0])" href="javascript:void(0);"></a>
+                    <a x-text="selectedDates[0]" @click="moveToSelectedDate(selectedDates[0], $data)" href="javascript:void(0);"></a>
                     ~
-                    <a x-text="selectedDates[1]" @click="moveFromDateText(selectedDates[1])" href="javascript:void(0);"></a>
+                    <a x-text="selectedDates[1]" @click="moveToSelectedDate(selectedDates[1], $data)" href="javascript:void(0);"></a>
                 </strong>
                 <button @click="selectEntry(null)">Clear</button>
             </p>
@@ -160,6 +161,10 @@
         }
 
         return availableDates
+    }
+
+    function moveToSelectedDate(date, controller) {
+        controller.moveFromDateText(date)
     }
 
     function changeAvailableDates() {
