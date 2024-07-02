@@ -23,5 +23,3 @@ const cmpDataTodos = () => {
 
     return initializerTodo
 }
-
-console.log("WTF")

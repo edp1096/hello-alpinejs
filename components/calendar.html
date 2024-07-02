@@ -1,8 +1,8 @@
 <link rel="stylesheet" type="text/css" href="components/calendar_cmp.css" />
 <script type="text/javascript" src="components/calendar_cmp.js"></script>
 
-<!-- <div x-data="calendar_module" id="calendar-container"> -->
-<div x-data="CalendarModuleController" id="calendar-container">
+<!-- Calendar main Begin -->
+<div x-data="calendar_module" id="calendar-container">
     <button onclick="changeAvailableDates(this)">Change availableDates</button>
     <br>
 
@@ -47,9 +47,8 @@
         </template>
     </p>
 
-    <!-- Calendar Begin -->
-    <!-- <table x-data="calendar_entry" class="calendar" x-ref="calendarEntry"> -->
-    <table x-data="CalendarEntryController" class="calendar">
+    <!-- Calendar entry Begin -->
+    <table x-data="calendar_entry" class="calendar" x-ref="calendarEntry">
         <thead>
             <tr>
                 <th colspan="7">
@@ -96,10 +95,9 @@
             </template>
         </tbody>
     </table>
-    <!-- Calendar End -->
+    <!-- Calendar entry End -->
 </div>
-
-</body>
+<!-- Calendar main End -->
 
 <script>
     // const availableDatesSomeDates = [

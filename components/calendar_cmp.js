@@ -350,7 +350,7 @@ const CalendarModuleController = () => {
     return objectData
 }
 
-// document.addEventListener("alpine:init", () => {
-//     Alpine.data("calendar_module", CalendarModuleController)
-//     Alpine.data("calendar_entry", CalendarEntryController)
-// })
+document.addEventListener("alpine:init", () => {
+    Alpine.data("calendar_module", CalendarModuleController)
+    Alpine.data("calendar_entry", CalendarEntryController)
+})
