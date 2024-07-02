@@ -10,11 +10,21 @@
 
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-dark.css">
     <link rel="stylesheet" href="calendar.css" />
+    <link rel="stylesheet" href="calendar-dark.css" />
     <script src="calendar.js"></script>
 </head>
 
-<body>
+<body x-data :class="$store.darkMode.on && 'dark'">
+    <button x-data @click="$store.darkMode.toggle()">
+        <span>Toggle Dark Mode - </span>
+        <span x-text="$store.darkMode.on ? 'Dark' : 'Light'"></span>
+    </button>
+    <br>
+    <br>
+
     <h1>Alpine.js Calendar</h1>
 
     <div x-data="calendar_module" id="calendar-container">
@@ -187,6 +197,22 @@
         calendarModule.setAvailables(availableDates)
         calendarModule.setSelectMode(selectMode)
         calendarModule.updateShowMonthCount(document.querySelector("#show-month-count").value)
+    })
+</script>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store("darkMode", {
+            on: false,
+
+            init() {
+                this.on = localStorage.getItem("darkMode") == "true"
+            },
+            toggle() {
+                this.on = !this.on
+                localStorage.setItem('darkMode', this.on)
+            }
+        })
     })
 </script>
 

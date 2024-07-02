@@ -7,11 +7,21 @@
     <title>Hello Alpine.js</title>
     <link rel="icon" href="data:,">
 
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@faker-js/faker@latest/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@faker-js/faker@latest/dist/faker.min.js" defer></script>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-dark.css">
 </head>
 
-<body>
+<body x-data :class="$store.darkMode.on && 'dark'">
+    <button x-data @click="$store.darkMode.toggle()">
+        <span>Toggle Dark Mode - </span>
+        <span x-text="$store.darkMode.on ? 'Dark' : 'Light'"></span>
+    </button>
+    <br>
+    <br>
+
     <a href="calendar.html">calendar</a>
     <br>
     <a href="shadow-dom.html">shadow-dom</a>
@@ -56,88 +66,104 @@
             </template>
         </ul>
     </div>
-
-    <script>
-        const dataCounter = () => {
-            const initializerCount = {
-                count: 0,
-                init() {
-                    const counting = this.$refs.counting
-                    if (counting.innerText.trim() != '') { this.count = parseInt(counting.innerText) }
-                }
-            }
-
-            return initializerCount
-        }
-
-        const dataTodos = () => {
-            const initializerTodo = {
-                todos: [],
-                init() {
-                    const todoItems = this.$refs.todoItem
-                    if (!todoItems || !todoItems.parentNode) { return false }
-
-                    for (const todo of todoItems.parentNode.children) {
-                        if (todo.hasAttribute('is-static')) {
-                            this.todos.push(todo.innerText)
-                            todo.remove()
-                        }
-                    }
-                },
-                addTodo() {
-                    const newTodo = `Todo ${this.todos.length + 1}`
-                    this.todos.push(newTodo)
-                },
-                removeTodo() {
-                    if (this.todos.length > 0) { this.todos.pop() }
-                }
-            }
-
-            return initializerTodo
-        }
-
-        const dataFamilies = () => {
-            const faker = window.Faker
-            const initializerFamily = {
-                families: [
-                    { Name: 'John Doe', Age: 30 },
-                    { Name: 'Jane Doe', Age: 28 },
-                    { Name: 'Michael Smith', Age: 32 },
-                    { Name: 'Emily Johnson', Age: 29 },
-                    { Name: 'Sophia Lee', Age: 31 },
-                    { Name: 'Daniel Williams', Age: 33 },
-                    { Name: 'Olivia Davis', Age: 27 },
-                    { Name: 'Matthew Wilson', Age: 35 },
-                    { Name: 'Emma Martinez', Age: 26 },
-                    { Name: 'Andrew Taylor', Age: 34 },
-                    { Name: 'Isabella Garcia', Age: 30 },
-                    { Name: 'David Moore', Age: 29 },
-                    { Name: 'Anna Anderson', Age: 31 },
-                    { Name: 'Jennifer Brown', Age: 28 },
-                    { Name: 'Kevin Thomas', Age: 32 },
-                    { Name: 'Sarah Thompson', Age: 27 }
-                ],
-                currentFamily: [],
-                init() { },
-                flushFamily() {
-                    const familyMembers = this.$root.querySelectorAll("li[is-static]")
-                    for (const m of familyMembers) {
-                        if (m.hasAttribute('is-static')) { m.remove() }
-                    }
-                },
-                getFamily() {
-                    this.flushFamily()
-                    this.currentFamily = []
-                    for (let i = 0; i < 3; i++) {
-                        const randomIndex = Math.floor(Math.random() * this.families.length)
-                        this.currentFamily.push(this.families[randomIndex])
-                    }
-                }
-            }
-
-            return initializerFamily
-        }
-    </script>
 </body>
+
+<script>
+    const dataCounter = () => {
+        const initializerCount = {
+            count: 0,
+            init() {
+                const counting = this.$refs.counting
+                if (counting.innerText.trim() != '') { this.count = parseInt(counting.innerText) }
+            }
+        }
+
+        return initializerCount
+    }
+
+    const dataTodos = () => {
+        const initializerTodo = {
+            todos: [],
+            init() {
+                const todoItems = this.$refs.todoItem
+                if (!todoItems || !todoItems.parentNode) { return false }
+
+                for (const todo of todoItems.parentNode.children) {
+                    if (todo.hasAttribute('is-static')) {
+                        this.todos.push(todo.innerText)
+                        todo.remove()
+                    }
+                }
+            },
+            addTodo() {
+                const newTodo = `Todo ${this.todos.length + 1}`
+                this.todos.push(newTodo)
+            },
+            removeTodo() {
+                if (this.todos.length > 0) { this.todos.pop() }
+            }
+        }
+
+        return initializerTodo
+    }
+
+    const dataFamilies = () => {
+        const faker = window.Faker
+        const initializerFamily = {
+            families: [
+                { Name: 'John Doe', Age: 30 },
+                { Name: 'Jane Doe', Age: 28 },
+                { Name: 'Michael Smith', Age: 32 },
+                { Name: 'Emily Johnson', Age: 29 },
+                { Name: 'Sophia Lee', Age: 31 },
+                { Name: 'Daniel Williams', Age: 33 },
+                { Name: 'Olivia Davis', Age: 27 },
+                { Name: 'Matthew Wilson', Age: 35 },
+                { Name: 'Emma Martinez', Age: 26 },
+                { Name: 'Andrew Taylor', Age: 34 },
+                { Name: 'Isabella Garcia', Age: 30 },
+                { Name: 'David Moore', Age: 29 },
+                { Name: 'Anna Anderson', Age: 31 },
+                { Name: 'Jennifer Brown', Age: 28 },
+                { Name: 'Kevin Thomas', Age: 32 },
+                { Name: 'Sarah Thompson', Age: 27 }
+            ],
+            currentFamily: [],
+            init() { },
+            flushFamily() {
+                const familyMembers = this.$root.querySelectorAll("li[is-static]")
+                for (const m of familyMembers) {
+                    if (m.hasAttribute('is-static')) { m.remove() }
+                }
+            },
+            getFamily() {
+                this.flushFamily()
+                this.currentFamily = []
+                for (let i = 0; i < 3; i++) {
+                    const randomIndex = Math.floor(Math.random() * this.families.length)
+                    this.currentFamily.push(this.families[randomIndex])
+                }
+            }
+        }
+
+        return initializerFamily
+    }
+</script>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store("darkMode", {
+            on: false,
+
+            init() {
+                this.on = localStorage.getItem("darkMode") == "true"
+            },
+            toggle() {
+                this.on = !this.on
+                localStorage.setItem('darkMode', this.on)
+            }
+        })
+    })
+</script>
 
 </html>

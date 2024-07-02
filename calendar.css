@@ -1,9 +1,3 @@
-html,
-body {
-    margin: 0.2em;
-    padding: 0;
-}
-
 .calendar {
     background-color: #ffffff;
     border: 1px solid #333333;
@@ -24,6 +18,7 @@ body {
 .calendar tbody td:has(button) {
     background-color: #bdebff;
 }
+
 .calendar tbody td button {
     border: none;
     background-color: #bdebff;
@@ -59,46 +54,4 @@ body {
 .calendar tbody td button.selected,
 .calendar tbody td button:hover {
     background-color: #fdd881;
-    /* outline: 3px solid #009fff;
-    outline-offset: -3px; */
-}
-
-.calendar .tools {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.calendar .tools button {
-    background-color: transparent;
-    border: 1px solid #0095d1;
-    border-radius: 3px;
-    color: #0095d1;
-    cursor: pointer;
-    padding: 5px 9px;
-}
-
-.calendar .tools button:first-of-type {
-    margin-right: auto;
-}
-
-.calendar .tools button:last-of-type {
-    margin-left: auto;
-}
-
-.jumper {
-    align-items: center;
-    display: flex;
-    gap: 10px;
-}
-
-.jumper button {
-    background-color: transparent;
-    border: 1px solid #0095d1;
-    border-radius: 3px;
-    color: #0095d1;
-    cursor: pointer;
-    padding: 2px 5px;
-    margin: 0;
 }
