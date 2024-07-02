@@ -1,0 +1,161 @@
+<link rel="stylesheet" type="text/css" href="components/calendar_cmp.css" />
+<script type="text/javascript" src="components/calendar_cmp.js"></script>
+
+<!-- <div x-data="calendar_module" id="calendar-container"> -->
+<div x-data="CalendarModuleController" id="calendar-container">
+    <button onclick="changeAvailableDates(this)">Change availableDates</button>
+    <br>
+
+    <label for="selection-mode">Selection mode:</label>
+    <select x-model="selectMode" id="selection-mode">
+        <option value="single" selected>Single</option>
+        <option value="multiple">Multiple</option>
+    </select>
+
+    <template x-if="!selectedEntry && selectedDates.length == 0">
+        <p>Please select date.</p>
+    </template>
+
+    <template x-if="selectedEntry">
+        <p>
+            Selected date:
+            <strong><span x-text="selectedDate"></span></strong>
+            <template x-if="selectedEntry?.isToday">
+                <span>(Today!)</span>
+            </template>
+            <button @click="selectEntry(null)">Clear</button>
+        </p>
+    </template>
+
+    <template x-if="selectedDates.length > 0">
+        <p>
+            Selected dates:
+            <strong>
+                <span x-text="selectedDates[0]"></span>
+                ~
+                <span x-text="selectedDates[1]"></span>
+            </strong>
+            <button @click="selectEntry(null)">Clear</button>
+        </p>
+    </template>
+
+    <p class="jumper">
+        <strong>Jump to:</strong>
+        <button @click="resetCalendar">Today</button>
+        <template x-for="(_, index) in Array(4).fill(null)" :key="index">
+            <button @click="jumpToYearCurrentMonth(getToday().year+index)" x-text="getToday().year+index"></button>
+        </template>
+    </p>
+
+    <!-- Calendar Begin -->
+    <!-- <table x-data="calendar_entry" class="calendar" x-ref="calendarEntry"> -->
+    <table x-data="CalendarEntryController" class="calendar">
+        <thead>
+            <tr>
+                <th colspan="7">
+                    <div class="tools">
+                        <!-- Previous month -->
+                        <button @click="gotoPrevMonth()">&larr;</button>
+
+                        <span x-text="monthName"></span>
+                        <span x-text="year"></span>
+
+                        <!-- Next month -->
+                        <button @click="gotoNextMonth()">&rarr;</button>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <template x-for="header in grid.headersAbbreviated" :key="header">
+                    <th scope="col" x-text="header">
+                    </th>
+                </template>
+            </tr>
+        </thead>
+
+        <tbody>
+            <template x-for="(week, i) in grid.weeks" :key="i">
+                <tr>
+                    <template x-for="entry in week" :key="entry.id">
+                        <td>
+                            <button @click="selectEntry(entry)" :class="{
+                                        current: entry.isCurrentMonth,
+                                        other: entry.isOtherMonth,
+                                        today: entry.isToday,
+                                        weekday: entry.isWeekday,
+                                        saturday: entry.isSaturday,
+                                        sunday: entry.isSunday,
+                                        selected: isSelected(entry)
+                                    }" :disabled="!getAvailable(entry)" x-text="entry.date">
+                                <!-- selected: (selectedEntry?.id == entry.id)
+                                    }" :disabled="!getAvailable(entry)" x-text="entry.date"> -->
+                            </button>
+                        </td>
+                    </template>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+    <!-- Calendar End -->
+</div>
+
+</body>
+
+<script>
+    // const availableDatesSomeDates = [
+    //     "2024-07-11", "2024-07-12", "2024-07-13", "2024-07-14", "2024-07-15", "2024-07-16",
+    //     "2024-07-17", "2024-07-19", "2024-07-20", "2024-07-21", "2024-07-22", "2024-07-23"
+    // ]
+    const availableDatesEmpty = []
+    let availableDates = []
+
+    const selectMode = "single"
+    // const selectMode = "multiple"
+
+    function createRandomAvailableDates() {
+        const today = new Date()
+        const year = today.getFullYear()
+        const month = today.getMonth()
+
+        const startDate = new Date(year, month, 1)
+        const endDate = new Date(year, month + 2, 0)
+
+        const allDates = []
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0')
+            const day = String(d.getDate()).padStart(2, '0')
+            allDates.push(`${y}-${m}-${day}`)
+        }
+
+        const availableDates = [...allDates]
+        const numDatesToRemove = Math.floor(Math.random() * (allDates.length / 2))
+        for (let i = 0; i < numDatesToRemove; i++) {
+            const randomIndex = Math.floor(Math.random() * availableDates.length)
+            availableDates.splice(randomIndex, 1)
+        }
+
+        return availableDates
+    }
+
+    function changeAvailableDates(el) {
+        if (availableDates.length > 0) {
+            availableDates = availableDatesEmpty
+        } else {
+            // availableDates = availableDatesSomeDates
+            availableDates = createRandomAvailableDates()
+        }
+
+        const calendarModule = Alpine.$data(el.getRootNode().querySelector("#calendar-container"))
+        calendarModule.clearSelection()
+        calendarModule.setAvailables(availableDates)
+
+        alert("Available dates change: " + JSON.stringify(availableDates))
+    }
+
+    document.addEventListener('alpine:initialized', (el) => {
+        // const calendarModule = Alpine.$data(shrootCalendar.querySelector("#calendar-container"))
+        // calendarModule.setAvailables(availableDates)
+        // calendarModule.setSelectMode(selectMode)
+    })
+</script>

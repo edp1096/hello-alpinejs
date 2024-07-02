@@ -1,31 +1,3 @@
-// class CmpCalendar extends HTMLElement {
-//     constructor() {
-//         super()
-//         this.attachShadow({ mode: 'open' })
-//     }
-
-//     async connectedCallback() {
-//         const response = await fetch('components/calendar.html')
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok')
-//         }
-//         const data = await response.text()
-//         this.shadowRoot.innerHTML = data
-
-//         this.executeScripts(this.shadowRoot)
-//     }
-
-//     executeScripts(root) {
-//         const scripts = root.querySelectorAll('script')
-//         scripts.forEach((script) => {
-//             const newScript = document.createElement('script')
-//             newScript.textContent = script.textContent
-//             script.replaceWith(newScript)
-//         })
-//     }
-// }
-// customElements.define('cmp-calendar', CmpCalendar)
-
 class CustomElement extends HTMLElement {
     constructor() {
         super()
@@ -33,7 +5,14 @@ class CustomElement extends HTMLElement {
     }
 
     async connectedCallback() {
-        const response = await fetch('components/content.html')
+        const src = this.getAttribute('data-src')
+        if (!src) {
+            console.error('No data-src attribute provided')
+            this.shadowRoot.innerHTML = `<p>Error: No data-src attribute provided.</p>`
+            return
+        }
+
+        const response = await fetch(src)
         if (!response.ok) {
             throw new Error('Network response was not ok')
         }

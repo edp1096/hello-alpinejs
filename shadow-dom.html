@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Alpine.js</title>
+    <link rel="icon" href="data:,">
+
+    <script defer src="https://cdn.jsdelivr.net/npm/@faker-js/faker@latest/dist/faker.min.js"></script>
+</head>
+
+<body>
+    <!-- 카운터 -->
+    <div x-data="dataCounter()">
+        <button @click="count++">Increment</button>
+        <button @click="count--">Decrement</button>
+
+        <h2 x-text="count" x-ref="counting">10</h2>
+    </div>
+
+    <div id="container-todo"></div>
+    <div id="container-calendar"></div>
+
+    <script>
+        const dataCounter = () => {
+            const initializerCount = {
+                count: 0,
+                init() {
+                    const counting = this.$refs.counting
+                    if (counting.innerText.trim() != '') { this.count = parseInt(counting.innerText) }
+                }
+            }
+
+            return initializerCount
+        }
+    </script>
+
+    <script>
+        async function loadScript(src, target, isDefer = false) {
+            const response = await fetch(src)
+            if (!response.ok) throw new Error(`Failed to load script at ${src}`)
+            const scriptText = await response.text()
+
+            const script = document.createElement('script')
+            script.textContent = scriptText
+            script.defer = isDefer
+            target.append(script)
+        }
+
+        function executeScripts(root) {
+            const srcs = []
+
+            const scripts = root.querySelectorAll('script')
+            scripts.forEach((script) => {
+                if (script.src) {
+                    srcs.push(script.src)
+                    return
+                }
+                const newScript = document.createElement('script')
+                newScript.textContent = script.textContent
+                root.append(newScript)
+            })
+
+            return srcs
+        }
+
+        async function loadHTML(fname, shroot, prefix = "") {
+            const r = await fetch(fname)
+            if (r.ok) {
+                const response = await r.text()
+                shroot.innerHTML = prefix + response
+
+                const jsSrcs = executeScripts(shroot)
+                for (const src of jsSrcs) {
+                    await loadScript(src, shroot, false)
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const shroots = []
+
+            document.querySelector("#container-todo").attachShadow({ mode: 'open' })
+            const shrootTodo = document.querySelector("#container-todo").shadowRoot
+            await loadHTML("components/todo.html", shrootTodo)
+            shroots.push(shrootTodo)
+
+            document.querySelector("#container-calendar").attachShadow({ mode: 'open' })
+            const shrootCalendar = document.querySelector("#container-calendar").shadowRoot
+            await loadHTML("components/calendar.html", shrootCalendar)
+            shroots.push(shrootCalendar)
+
+            await loadScript("https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js", document.body, true)
+            if (typeof Alpine !== 'undefined') {
+                // for (const shroot of shroots) { Alpine.initTree(shroot) }
+                Alpine.initTree(shrootTodo)
+                Alpine.initTree(shrootCalendar)
+            }
+        })
+    </script>
+</body>
+
+</html>
