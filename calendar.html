@@ -31,7 +31,7 @@
 
     <div x-data="{ open: false, date: '' }">
         <label for="datepick">Date picker:</label>
-        <input name="datepick" id="datepick" @focus="open = true" x-model="date" onkeypress="return false;" placeholder="Show datepicker">
+        <input name="datepick" id="datepick" @focus="open = true" x-model="date" placeholder="Show datepicker" onkeypress="return false;" readonly>
         <button @click="open = !open" style="position: relative; left: -3.5em; font-size: xx-small; background-color: transparent; border: 0 solid transparent;">
             📅
         </button>
