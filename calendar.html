@@ -27,6 +27,108 @@
 
     <h1>Alpine.js Calendar</h1>
 
+
+
+    <div x-data="{ open: false, date: '' }">
+        <label for="datepick">Date picker:</label>
+        <input name="datepick" id="datepick" @focus="open = true" x-model="date" onkeypress="return false;" placeholder="Show datepicker">
+        <button @click="open = !open" style="position: relative; left: -3.5em; font-size: xx-small; background-color: transparent; border: 0 solid transparent;">
+            📅
+        </button>
+
+        <div x-show="open" x-transition style="position: fixed; background-color: #2d2d2d;">
+            <div x-data="calendar_module" id="calendar-container2">
+                <template x-if="!selectedEntry && selectedDates.length == 0">
+                    <p>Please select date.</p>
+                </template>
+
+                <template x-if="selectedEntry">
+                    <p>
+                        Selected date:
+                        <strong>
+                            <a x-text="selectedDate" @click="moveToSelectedDate(selectedDate, $data)" href="javascript:void(0);"></a>
+                        </strong>
+                        <template x-if="selectedEntry.isToday">
+                            <span>(Today!)</span>
+                        </template>
+                        <button @click="selectDateEntry(null, $data); date=''">Clear</button>
+                    </p>
+                </template>
+
+                <template x-if="selectedDates.length > 0">
+                    <p>
+                        Selected dates:
+                        <strong>
+                            <a x-text="selectedDates[0]" @click="moveToSelectedDate(selectedDates[0], $data)" href="javascript:void(0);"></a>
+                            ~
+                            <a x-text="selectedDates[1]" @click="moveToSelectedDate(selectedDates[1], $data)" href="javascript:void(0);"></a>
+                        </strong>
+                        <button @click="selectDateEntry(null, $data); date=''">Clear</button>
+                    </p>
+                </template>
+
+                <p class="jumper">
+                    <strong>Jump to:</strong>
+                    <button @click="resetCalendar">Today</button>
+                    <template x-for="(_, index) in Array(5).fill(null)" :key="index">
+                        <button @click="moveToYearCurrentMonth(getToday().year+index)" x-text="getToday().year+index"></button>
+                    </template>
+                </p>
+
+                <!-- Calendar entry Begin -->
+                <div x-data="calendar_entry" class="calendar-entry-container" style="display: flex; flex-wrap: wrap;">
+                    <template x-for="(g, k) in grids" :key="k">
+                        <table class="calendar">
+                            <thead>
+                                <tr>
+                                    <th colspan="7">
+                                        <div class="tools">
+                                            <button @click="gotoPrevMonth()">&larr;</button>
+                                            <span x-text="monthNames[k]"></span>
+                                            <span x-text="years[k]"></span>
+                                            <button @click="gotoNextMonth()">&rarr;</button>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <template x-for="header in g.headersAbbreviated" :key="header">
+                                        <th scope="col" x-text="header">
+                                        </th>
+                                    </template>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <template x-for="(week, i) in g.weeks" :key="i">
+                                    <tr>
+                                        <template x-for="entry in week" :key="entry.id">
+                                            <td>
+                                                <button @click="selectDateEntry(entry, $data); date=selectedDate" :class="{
+                                                    current: entry.isCurrentMonth,
+                                                    other: entry.isOtherMonth,
+                                                    today: entry.isToday,
+                                                    weekday: entry.isWeekday,
+                                                    saturday: entry.isSaturday,
+                                                    sunday: entry.isSunday,
+                                                    selected: isSelected(entry)
+                                                }" :disabled="!getAvailable(entry)" x-text="entry.date">
+                                                </button>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </template>
+                </div>
+                <!-- Calendar entry End -->
+            </div>
+        </div>
+    </div>
+
+
+
+
     <div x-data="calendar_module" id="calendar-container">
         <button onclick="changeAvailableDates()">Change availableDates</button>
         <br>
@@ -85,7 +187,7 @@
             </template>
         </p>
 
-        <!-- Calendar Begin -->
+        <!-- Calendar entry Begin -->
         <div x-data="calendar_entry" class="calendar-entry-container" style="display: flex; flex-wrap: wrap;">
             <template x-for="(g, k) in grids" :key="k">
                 <table class="calendar">
@@ -131,8 +233,9 @@
                 </table>
             </template>
         </div>
-        <!-- Calendar End -->
+        <!-- Calendar entry End -->
     </div>
+
 </body>
 
 <script>
