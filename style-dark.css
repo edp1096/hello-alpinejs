@@ -2,3 +2,21 @@ body.dark {
     background-color: black;
     color: white;
 }
+
+body.dark a {
+    color: #1e90ff;
+    text-decoration: none;
+}
+
+body.dark a:hover {
+    color: #ff6347;
+    text-decoration: underline;
+}
+
+body.dark a:visited {
+    color: #ba55d3;
+}
+
+body.dark a:active {
+    color: #ff4500;
+}

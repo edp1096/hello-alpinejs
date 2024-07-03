@@ -9,3 +9,21 @@ body {
     color: black;
     transition: background-color 0.3s, color 0.3s;
 }
+
+body a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+body a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+body a:visited {
+    color: #551a8b;
+}
+
+body a:active {
+    color: #d9534f;
+}
