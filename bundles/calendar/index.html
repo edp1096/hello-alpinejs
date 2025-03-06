@@ -31,6 +31,28 @@
         .main-content {
             margin: 30px 0;
         }
+
+        /* Datepicker */
+        .datepicker-container {
+            margin-bottom: 20px;
+        }
+
+        .datepicker-popup {
+            position: absolute;
+            z-index: 100;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-icon {
+            position: relative;
+            left: -30px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
     </style>
     <!-- 번들링된 CSS 파일 로드 -->
     <link rel="stylesheet" href="./dist/calendar-styles.css">
@@ -44,11 +66,20 @@
         <p>아래 캘린더는 별도의 JS 파일로 번들링된 컴포넌트입니다.</p>
     </div>
 
-    <!-- 캘린더 컴포넌트가 마운트될 요소 -->
+    <h2>Datepicker</h2>
+    <div x-data="{ open: false, date: '' }" class="datepicker-container">
+        <label for="datepick">Datepicker:</label>
+        <input name="datepick" id="datepick" @click="open = true" x-model="date" placeholder="Click to open" onkeypress="return false;" readonly>
+        <button @click="open = !open" class="calendar-icon" style="position: relative; left: -3.5em; font-size: xx-small; background-color: transparent; border: 0 solid transparent;">📅</button>
+
+        <div x-show="open" x-transition class="datepicker-popup" @click.away="open = false">
+            <div id="datepicker-calendar" class="calendar-container"></div>
+        </div>
+    </div>
+
     <h2>캘린더 수동 마운트</h2>
     <div class="calendar-container" id="calendar-mount"></div>
 
-    <!-- 자동 마운트 예제 -->
     <h2>캘린더 자동 마운트</h2>
     <div class="calendar-container" data-calendar-mount></div>
 
@@ -57,25 +88,47 @@
         <p>위쪽은 JavaScript로 마운트한 예제, 아래쪽은 data-calendar-mount 속성으로 자동 마운트한 예제입니다.</p>
     </div>
 
-    <!-- Alpine.js 런타임 직접 로드 -->
     <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
 
-    <!-- 번들된 컴포넌트 로드 (일반 스크립트) -->
     <script src="./dist/calendar-bundle.js"></script>
-
-    <!-- 컴포넌트 초기화 -->
     <script>
-        // 페이지 로드 후 캘린더 컴포넌트 수동 마운트
-        document.addEventListener('DOMContentLoaded', function () {
-            // CalendarComponent는 전역 변수로 노출됨
+        function selectDate(dateText, calendarInstance, datepickerElement) {
+            const datepickerScope = Alpine.$data(datepickerElement);
+            datepickerScope.date = dateText;
+            datepickerScope.open = false;
+        }
+
+        // 수동 마운트, Datepicker
+        document.addEventListener('DOMContentLoaded', async function () {
             if (CalendarComponent) {
                 const calendar = CalendarComponent.registerCalendar({
-                    selectMode: 'single',  // 'single' 또는 'multiple'
-                    availableDates: []     // 비어있으면 모든 날짜 선택 가능
+                    selectMode: 'single',
+                    availableDates: [] // 비어있으면 모든 날짜 선택 가능
                 });
 
-                if (calendar) {
-                    calendar.mount('#calendar-mount');
+                if (calendar) { calendar.mount('#calendar-mount'); }
+
+
+                // Datepicker
+                const datepickerCalendar = CalendarComponent.registerCalendar({
+                    selectMode: 'single'
+                });
+
+                if (datepickerCalendar) {
+                    await datepickerCalendar.mount('#datepicker-calendar');
+                    const calendarModule = Alpine.$data(document.querySelector('#datepicker-calendar').querySelector('[x-data*="calendar_module"]'));
+
+                    if (calendarModule) {
+                        const originalSelectEntry = calendarModule.selectEntry;
+                        calendarModule.selectEntry = function (entry = null) {
+                            originalSelectEntry.call(this, entry);
+
+                            if (entry && this.selectedDate) {
+                                const datepickerElement = document.querySelector('.datepicker-container');
+                                selectDate(this.selectedDate, this, datepickerElement);
+                            }
+                        };
+                    }
                 }
             }
         });
