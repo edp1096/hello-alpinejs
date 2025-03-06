@@ -13,26 +13,56 @@ const livereloadScript = `
   <!-- 라이브 리로드 스크립트 -->
   <script>
     (function() {
-      const socket = new WebSocket('ws://localhost:8001');
-      
-      socket.addEventListener('open', function() {
-        console.log('라이브 리로드 연결됨');
-      });
-      
-      socket.addEventListener('message', function(event) {
-        if(event.data === 'reload') {
-          console.log('변경 감지: 페이지 새로고침');
-          location.reload();
-        }
-      });
-      
-      socket.addEventListener('close', function() {
-        console.log('라이브 리로드 연결 종료. 재연결 시도...');
-        setTimeout(() => {
-          // 서버 재시작 시 재연결 시도
-          window.location.reload();
-        }, 2000);
-      });
+      let reconnectAttempts = 0;
+      const maxReconnectAttempts = 2;
+      const reconnectInterval = 100; // 0.1초
+      let socket;
+
+      // WebSocket 연결 함수
+      function connectWebSocket() {
+        socket = new WebSocket('ws://localhost:8001');
+
+        socket.addEventListener('open', function() {
+          console.log('라이브 리로드 연결됨');
+          reconnectAttempts = 0; // 연결 성공 시 재시도 카운터 초기화
+        });
+
+        socket.addEventListener('message', function(event) {
+          if(event.data === 'reload') {
+            console.log('변경 감지: 페이지 새로고침');
+            location.reload();
+          }
+        });
+
+        socket.addEventListener('close', function() {
+          // 재연결 시도
+          if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            console.log(\`라이브 리로드 연결 종료. 재연결 시도 (\${reconnectAttempts}/\${maxReconnectAttempts})...\`);
+
+            setTimeout(() => { connectWebSocket(); }, reconnectInterval);
+          } else {
+            console.log('최대 재연결 시도 횟수 초과. 창을 닫습니다.');
+            // 브라우저 창 닫기 시도
+            window.close();
+
+            // window.close()가 작동하지 않을 경우 (보안 정책 등의 이유로)
+            // 사용자에게 메시지 표시
+            setTimeout(() => {
+              if (!window.closed) {
+                alert('라이브 리로드 서버에 연결할 수 없습니다. 수동으로 창을 닫고 개발 서버를 확인해주세요.');
+              }
+            }, 500);
+          }
+        });
+
+        socket.addEventListener('error', function(error) {
+          console.error('WebSocket 오류:', error);
+        });
+      }
+
+      // 초기 연결 시작
+      connectWebSocket();
     })();
   </script>
 `;

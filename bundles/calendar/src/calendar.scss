@@ -1,0 +1,100 @@
+// src/calendar.scss
+.alpine-calendar-component {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    // 캘린더 테이블
+    &__calendar {
+        background-color: #ffffff;
+        border: 1px solid #333333;
+        border-collapse: collapse;
+        margin: 20px 0;
+
+        th {
+            border: 1px solid #333333;
+            padding: 10px 15px;
+        }
+
+        td {
+            border: 1px solid #333333;
+            padding: 0;
+
+            button {
+                border: none;
+                background-color: #bdebff;
+                cursor: pointer;
+                display: block;
+                padding: 10px 15px;
+                width: 100%;
+
+                &.saturday {
+                    color: #4f7bcb;
+                }
+
+                &.sunday {
+                    color: red;
+                }
+
+                &.other {
+                    background-color: #f8fdff;
+                }
+
+                &.today {
+                    background-color: #0095d1;
+                    color: #ffffff;
+                    font-weight: bold;
+                }
+
+                &:disabled {
+                    color: #bbb;
+                }
+
+                &.selected,
+                &:hover {
+                    background-color: #fdd881;
+                }
+            }
+        }
+    }
+
+    // 툴바
+    &__tools {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+
+        button {
+            background-color: transparent;
+            border: 1px solid #0095d1;
+            border-radius: 3px;
+            color: #0095d1;
+            cursor: pointer;
+            padding: 5px 9px;
+
+            &:first-of-type {
+                margin-right: auto;
+            }
+
+            &:last-of-type {
+                margin-left: auto;
+            }
+        }
+    }
+
+    // 점퍼
+    &__jumper {
+        align-items: center;
+        display: flex;
+        gap: 10px;
+
+        button {
+            background-color: transparent;
+            border: 1px solid #0095d1;
+            border-radius: 3px;
+            color: #0095d1;
+            cursor: pointer;
+            padding: 2px 5px;
+            margin: 0;
+        }
+    }
+}

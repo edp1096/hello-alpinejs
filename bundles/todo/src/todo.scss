@@ -1,0 +1,81 @@
+// src/todo.scss
+.alpine-todo-component {
+    // 컴포넌트 전체 래퍼
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    // 컨트롤 버튼 영역
+    &__controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    // 버튼 스타일
+    &__button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s;
+        font-size: 14px;
+        color: white;
+
+        &:hover {
+            opacity: 0.9;
+        }
+
+        &:active {
+            transform: translateY(1px);
+        }
+
+        &.add {
+            background-color: #4CAF50;
+
+            &:hover {
+                background-color: #45a049;
+            }
+        }
+
+        &.remove {
+            background-color: #f44336;
+
+            &:hover {
+                background-color: #d32f2f;
+            }
+        }
+    }
+
+    // Todo 리스트
+    &__list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    // Todo 아이템
+    &__item {
+        padding: 12px 15px;
+        background-color: white;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #f5f5f5;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}

@@ -1,0 +1,18 @@
+<!-- src/todo.html -->
+<div x-data="todoComponent" x-init="init()" class="alpine-todo-component">
+    <div class="alpine-todo-component__controls">
+        <button @click="addTodo()" class="alpine-todo-component__button add">Add Todo</button>
+        <button @click="removeTodo()" class="alpine-todo-component__button remove">Remove Todo</button>
+    </div>
+
+    <ul class="alpine-todo-component__list">
+        <li is-static x-ref="todoItem" class="alpine-todo-component__item">Todo 1</li>
+        <li is-static x-ref="todoItem" class="alpine-todo-component__item">Todo 2</li>
+
+        <template x-if="todos.length > 0">
+            <template x-for="(todo, index) in todos" :key="index">
+                <li x-text="todo" class="alpine-todo-component__item"></li>
+            </template>
+        </template>
+    </ul>
+</div>

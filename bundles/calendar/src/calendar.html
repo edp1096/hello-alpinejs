@@ -1,0 +1,93 @@
+<!-- src/calendar.html -->
+<div x-data="calendar_module" class="alpine-calendar-component">
+    <button @click="changeAvailableDates">Change availableDates</button>
+    <br>
+
+    <label for="selection-mode">Selection mode:</label>
+    <select x-model="selectMode" id="selection-mode">
+        <option value="single" selected>Single</option>
+        <option value="multiple">Multiple</option>
+    </select>
+
+    <template x-if="!selectedEntry && selectedDates.length == 0">
+        <p>Please select date.</p>
+    </template>
+
+    <template x-if="selectedEntry">
+        <p>
+            Selected date:
+            <strong><span x-text="selectedDate"></span></strong>
+            <template x-if="selectedEntry?.isToday">
+                <span>(Today!)</span>
+            </template>
+            <button @click="selectEntry(null)">Clear</button>
+        </p>
+    </template>
+
+    <template x-if="selectedDates.length > 0">
+        <p>
+            Selected dates:
+            <strong>
+                <span x-text="selectedDates[0]"></span>
+                ~
+                <span x-text="selectedDates[1]"></span>
+            </strong>
+            <button @click="selectEntry(null)">Clear</button>
+        </p>
+    </template>
+
+    <p class="alpine-calendar-component__jumper">
+        <strong>Jump to:</strong>
+        <button @click="resetCalendar">Today</button>
+        <template x-for="(_, index) in Array(4).fill(null)" :key="index">
+            <button @click="jumpToYearCurrentMonth(getToday().year+index)" x-text="getToday().year+index"></button>
+        </template>
+    </p>
+
+    <!-- Calendar entry Begin -->
+    <table x-data="calendar_entry" class="alpine-calendar-component__calendar" x-ref="calendarEntry">
+        <thead>
+            <tr>
+                <th colspan="7">
+                    <div class="alpine-calendar-component__tools">
+                        <!-- Previous month -->
+                        <button @click="gotoPrevMonth()">&larr;</button>
+
+                        <span x-text="monthName"></span>
+                        <span x-text="year"></span>
+
+                        <!-- Next month -->
+                        <button @click="gotoNextMonth()">&rarr;</button>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <template x-for="header in grid.headersAbbreviated" :key="header">
+                    <th scope="col" x-text="header">
+                    </th>
+                </template>
+            </tr>
+        </thead>
+
+        <tbody>
+            <template x-for="(week, i) in grid.weeks" :key="i">
+                <tr>
+                    <template x-for="entry in week" :key="entry.id">
+                        <td>
+                            <button @click="selectEntry(entry)" :class="{
+                                        'current': entry.isCurrentMonth,
+                                        'other': entry.isOtherMonth,
+                                        'today': entry.isToday,
+                                        'weekday': entry.isWeekday,
+                                        'saturday': entry.isSaturday,
+                                        'sunday': entry.isSunday,
+                                        'selected': isSelected(entry)
+                                    }" :disabled="!getAvailable(entry)" x-text="entry.date">
+                            </button>
+                        </td>
+                    </template>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
