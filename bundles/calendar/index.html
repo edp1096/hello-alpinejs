@@ -10,7 +10,7 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            max-width: 800px;
+            /* max-width: 800px; */
             margin: 0 auto;
             padding: 10px;
         }
@@ -67,12 +67,20 @@
     </div>
 
     <h2>Datepicker</h2>
-    <div x-data="{ open: false, date: '' }" class="datepicker-container">
+    <div x-data="datepickerContainer" class="datepicker-container">
         <label for="datepick">Datepicker:</label>
-        <input name="datepick" id="datepick" @click="open = true" x-model="date" placeholder="Click to open" onkeypress="return false;" readonly>
+        <input name="date1" id="datepick" @click="open = true" x-model="date" placeholder="Click to open" onkeypress="return false;" readonly>
         <button @click="open = !open" class="calendar-icon" style="position: relative; left: -3.5em; font-size: xx-small; background-color: transparent; border: 0 solid transparent;">📅</button>
+        <template x-if="selectMode == 'multiple'">
+            <span>
+                ~
+                <input name="date2" id="datepick2" @click="open = true" x-model="date2" placeholder="Click to open" onkeypress="return false;" readonly>
+                <button @click="open = !open" class="calendar-icon" style="position: relative; left: -3.5em; font-size: xx-small; background-color: transparent; border: 0 solid transparent;">📅</button>
+            </span>
+        </template>
 
         <div x-show="open" x-transition class="datepicker-popup" @click.away="open = false">
+            <button @click="open = false">닫기</button>
             <div id="datepicker-calendar" class="calendar-container"></div>
         </div>
     </div>
@@ -81,7 +89,7 @@
     <div class="calendar-container" id="calendar-mount"></div>
 
     <h2>캘린더 자동 마운트</h2>
-    <div class="calendar-container" data-calendar-mount></div>
+    <div class="calendar-container" data-calendar-mount data-calendar-count="2" data-calendar-select-mode="multiple" data-calendar-available-dates='[]'></div>
 
     <div class="main-content">
         <p>메인 페이지의 HTML은 간결하게 유지되고, 컴포넌트 로직과 템플릿은 모두 번들에 포함되어 있습니다.</p>
@@ -92,28 +100,66 @@
 
     <script src="./dist/calendar-bundle.js"></script>
     <script>
+        const datepickerContainer = {
+            open: false,
+            date: '',
+            date2: '',
+            selectMode: '',
+            init() {
+                // 열리면 기선택날짜 삭제
+                // this.$watch('open', (value) => {
+                //     if (value == true) {
+                //         this.date = '';
+                //         this.date2 = '';
+
+                //         const calendarElement = document.querySelector('#datepicker-calendar');
+                //         if (calendarElement) {
+                //             const calendarModule = Alpine.$data(calendarElement.querySelector('[x-data*="calendar_module"]'));
+                //             if (calendarModule) {
+                //                 calendarModule.selectedDate = "";
+                //                 calendarModule.selectedDates = [];
+                //             }
+                //         }
+                //     }
+                // });
+
+                this.$nextTick(() => {
+                    const calendarElement = document.querySelector('#datepicker-calendar');
+                    if (calendarElement) {
+                        const calendarModule = Alpine.$data(calendarElement.querySelector('[x-data*="calendar_module"]'));
+                        if (calendarModule) {
+                            this.selectMode = calendarModule.selectMode;
+                            this.$watch('selectMode', () => { calendarModule.selectMode = this.selectMode; });
+                            calendarModule.$watch('selectMode', (value) => { this.selectMode = value; });
+                        }
+                    }
+                });
+            }
+        }
+
         function selectDate(dateText, calendarInstance, datepickerElement) {
             const datepickerScope = Alpine.$data(datepickerElement);
             datepickerScope.date = dateText;
-            datepickerScope.open = false;
+            // datepickerScope.open = false;
+        }
+        function selectDates(dateTexts, calendarInstance, datepickerElement) {
+            const datepickerScope = Alpine.$data(datepickerElement);
+            datepickerScope.date = dateTexts[0];
+            datepickerScope.date2 = dateTexts[1];
+            // datepickerScope.open = false;
         }
 
-        // 수동 마운트, Datepicker
-        document.addEventListener('DOMContentLoaded', async function () {
+        const calendarConfig = {
+            showCalendarCount: 2,
+            selectMode: 'multiple'
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
             if (CalendarComponent) {
-                const calendar = CalendarComponent.registerCalendar({
-                    selectMode: 'single',
-                    availableDates: [] // 비어있으면 모든 날짜 선택 가능
-                });
-
-                if (calendar) { calendar.mount('#calendar-mount'); }
-
-
                 // Datepicker
-                const datepickerCalendar = CalendarComponent.registerCalendar({
-                    selectMode: 'single'
-                });
-
+                const datepickerCalendar = CalendarComponent.registerCalendar(calendarConfig);
+                // 아래처럼 하려면 다른 요소보다 먼저 실행되어야 함.
+                // 그러지 않으면 나머지 요소들의 마운트 여부에 상관없이 모조리 영향을 끼침
                 if (datepickerCalendar) {
                     await datepickerCalendar.mount('#datepicker-calendar');
                     const calendarModule = Alpine.$data(document.querySelector('#datepicker-calendar').querySelector('[x-data*="calendar_module"]'));
@@ -127,9 +173,20 @@
                                 const datepickerElement = document.querySelector('.datepicker-container');
                                 selectDate(this.selectedDate, this, datepickerElement);
                             }
+                            if (entry && this.selectedDates.length == 2) {
+                                const datepickerElement = document.querySelector('.datepicker-container');
+                                selectDates(this.selectedDates, this, datepickerElement);
+                            }
                         };
                     }
                 }
+
+                // 수동 마운트
+                calendarConfig.showCalendarCount = 1;
+                calendarConfig.selectMode = 'single';
+                calendarConfig.availableDates = ["random"]; // 첫 요소가 random 이면 데모용 랜덤 날짜. 설정이 없거나 빈 행렬([])이면 모든 날짜
+                const calendar = CalendarComponent.registerCalendar(calendarConfig);
+                if (calendar) { calendar.mount('#calendar-mount'); }
             }
         });
     </script>

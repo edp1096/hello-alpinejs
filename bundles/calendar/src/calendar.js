@@ -108,19 +108,19 @@ function getDaysInMonth(year, month) {
 }
 
 function getIsFirstEntryOfWeek(entry) {
-    return (entry.day === 0);
+    return (entry.day == 0);
 }
 
 function getIsLastEntryOfWeek(entry) {
-    return (entry.day === 6);
+    return (entry.day == 6);
 }
 
 function getIsToday(date) {
     const timestamp = new Date();
     const isToday = (
-        (date.getFullYear() === timestamp.getFullYear()) &&
-        (date.getMonth() === timestamp.getMonth()) &&
-        (date.getDate() === timestamp.getDate())
+        (date.getFullYear() == timestamp.getFullYear()) &&
+        (date.getMonth() == timestamp.getMonth()) &&
+        (date.getDate() == timestamp.getDate())
     );
 
     return isToday;
@@ -131,15 +131,15 @@ function getIsWeekday(day) {
 }
 
 function getIsWeekend(day) {
-    return ((day === 0) || (day === 6));
+    return ((day == 0) || (day == 6));
 }
 
 function getIsSaturday(day) {
-    return (day === 6);
+    return (day == 6);
 }
 
 function getIsSunday(day) {
-    return (day === 0);
+    return (day == 0);
 }
 
 function getYMD(year, month, date) {
@@ -155,22 +155,48 @@ function getYmdFromEntry(entry) {
     return ymd;
 }
 
-// Alpine.js Data Controllers
 const CalendarEntryController = (initialYear, initialMonth) => {
+    let showCalendarCount = 1
+
     const timestamp = new Date();
     const year = (initialYear ?? timestamp.getFullYear());
     const month = (initialMonth ?? timestamp.getMonth());
-    const monthName = CALENDAR_MONTHS[month];
+    // const monthName = CALENDAR_MONTHS[month];
 
-    const entries = buildEntries(year, month);
-    const grid = buildGrid(entries);
+    // const entries = buildEntries(year, month);
+    // const grid = buildGrid(entries);
 
-    return {
+    let years = []
+    let months = []
+    let monthNames = []
+    let grids = []
+    for (let i = 0; i < showCalendarCount; i++) {
+        const timestamp_appender = new Date(year, month + (i))
+        const years_appender = timestamp_appender.getFullYear()
+        const months_appender = timestamp_appender.getMonth()
+        const monthNames_appender = CALENDAR_MONTHS[months_appender]
+
+        years.push(years_appender)
+        months.push(months_appender)
+        monthNames.push(monthNames_appender)
+
+        const entries_appender = buildEntries(years_appender, months_appender)
+        grids.push(buildGrid(entries_appender))
+    }
+
+    const controller = {
+        moreMonthCount: showCalendarCount,
+
         year: year,
         month: month,
-        monthName: monthName,
-        entries: entries,
-        grid: grid,
+        // monthName: monthName,
+        // entries: entries,
+        // grid: grid,
+
+        years: years,
+        months: months,
+        monthNames: monthNames,
+        grids: grids,
 
         gotoDate(target) {
             this.year = target.getFullYear();
@@ -178,35 +204,54 @@ const CalendarEntryController = (initialYear, initialMonth) => {
             this.monthName = CALENDAR_MONTHS[this.month];
             this.entries = buildEntries(this.year, this.month);
             this.grid = buildGrid(this.entries);
+
+            this.years = []
+            this.months = []
+            this.monthNames = []
+            this.grids = []
+            for (let i = 0; i < this.moreMonthCount; i++) {
+                const timestamp_appender = new Date(this.year, this.month + i)
+                const years_appender = timestamp_appender.getFullYear()
+                const months_appender = timestamp_appender.getMonth()
+                const monthNames_appender = CALENDAR_MONTHS[months_appender]
+
+                this.years.push(years_appender)
+                this.months.push(months_appender)
+                this.monthNames.push(monthNames_appender)
+
+                const entries_appender = buildEntries(years_appender, months_appender)
+                this.grids.push(buildGrid(entries_appender))
+            }
         },
-        gotoNextMonth() {
-            this.gotoDate(new Date(this.year, (this.month + 1), 1));
-        },
-        gotoToday() {
-            this.gotoDate(new Date());
-        },
-        gotoPrevMonth() {
-            this.gotoDate(new Date(this.year, (this.month - 1), 1));
-        },
-        gotoYear(year, month) {
-            this.gotoDate(new Date(year, (month || 0), 1));
-        }
-    };
+        gotoNextMonth() { this.gotoDate(new Date(this.year, (this.month + 1), 1)); },
+        gotoToday() { this.gotoDate(new Date()); },
+        gotoPrevMonth() { this.gotoDate(new Date(this.year, (this.month - 1), 1)); },
+        gotoYear(year, month) { this.gotoDate(new Date(year, (month || 0), 1)); }
+    }
+
+    return controller;
 };
 
-const CalendarModuleController = () => {
-    return {
-        selectMode: "single",
+const CalendarModuleController = (config = {}) => {
+    const controller = {
+        showCalendarCount: config.showCalendarCount || 1,
+        selectMode: config.selectMode || "single",
         selectedEntry: null,
         selectedDate: null,
         selectedDates: [],
-        availables: [],
+        availables: config.availableDates || [],
 
-        init() {
+        async init() {
             this.$watch("selectMode", () => { this.clearSelection(); });
-
             // Random available dates for demo
-            this.setAvailables(this.createRandomAvailableDates());
+            if (this.availables[0] == "random") {
+                this.setAvailables(this.createRandomAvailableDates());
+            }
+
+            if (this.showCalendarCount > 1) {
+                await this.$nextTick();
+                this.updateShowMonthCount(this.showCalendarCount)
+            }
         },
         createRandomAvailableDates() {
             const today = new Date();
@@ -258,15 +303,17 @@ const CalendarModuleController = () => {
             this.selectedDate = null;
             this.selectedDates = [];
         },
-        setSelectMode(mode) {
-            this.selectMode = mode;
+        setSelectMode(mode) { this.selectMode = mode; },
+        updateShowMonthCount(count) {
+            if (count <= 0) { count = 1 }
+            this.getCalendarDataObject().moreMonthCount = count
+            this.clearSelection()
+            this.jumpToYearCurrentMonth(this.getCalendarDataObject().year)
         },
-        setAvailables(availables) {
-            this.availables = availables;
-        },
+        setAvailables(availables) { this.availables = availables; },
         getAvailable(entry) {
             // always available if empty
-            if (!this.availables || this.availables.length === 0) { return true; }
+            if (!this.availables || this.availables.length == 0) { return true; }
 
             const year = entry.year;
             const month = (entry.month + 1).toString().padStart(2, '0');
@@ -275,37 +322,29 @@ const CalendarModuleController = () => {
 
             return this.availables.includes(ymd);
         },
-        getCalendarDataObject() {
-            return Alpine.$data(this.$root.querySelector("table"));
-        },
-        jumpToYear(year) {
-            this.getCalendarDataObject().gotoYear(year);
-        },
-        jumpToYearCurrentMonth(year) {
-            this.getCalendarDataObject().gotoYear(year, this.getCalendarDataObject().month);
-        },
-        resetCalendar() {
-            this.getCalendarDataObject().gotoToday();
-        },
+        getCalendarDataObject() { return Alpine.$data(this.$root.querySelector("table")); },
+        jumpToYear(year) { this.getCalendarDataObject().gotoYear(year); },
+        jumpToYearCurrentMonth(year) { this.getCalendarDataObject().gotoYear(year, this.getCalendarDataObject().month); },
+        resetCalendar() { this.getCalendarDataObject().gotoToday(); },
         isSelected(entry) {
             let result = false;
 
             switch (this.selectMode) {
                 case "single":
-                    result = this.selectedEntry?.id === entry.id;
+                    result = this.selectedEntry?.id == entry.id;
                     break;
                 case "multiple":
                     const ymd = getYmdFromEntry(entry);
 
-                    if (this.selectedDates.length === 1) {
+                    if (this.selectedDates.length == 1) {
                         result = this.selectedDates.includes(ymd);
-                    } else if (this.selectedDates.length === 2) {
+                    } else if (this.selectedDates.length == 2) {
                         const s1 = this.selectedDates[0];
                         const s2 = this.selectedDates[1];
 
                         for (let date1 = new Date(s1); date1 <= new Date(s2); date1.setDate(date1.getDate() + 1)) {
                             const ymd1 = getYMD(date1.getFullYear(), date1.getMonth(), date1.getDate());
-                            if (ymd === ymd1) {
+                            if (ymd == ymd1) {
                                 result = true;
                                 break;
                             }
@@ -319,7 +358,7 @@ const CalendarModuleController = () => {
         selectEntry(entry = null) {
             switch (this.selectMode) {
                 case "single":
-                    if (entry && this.selectedEntry && this.selectedEntry.id === entry.id) {
+                    if (entry && this.selectedEntry && this.selectedEntry.id == entry.id) {
                         this.selectedEntry = null; // Toggle same entry
                         return;
                     }
@@ -331,7 +370,7 @@ const CalendarModuleController = () => {
                     }
                     break;
                 case "multiple":
-                    if (entry === null) {
+                    if (entry == null) {
                         this.selectedDates = [];
                         return;
                     }
@@ -344,7 +383,7 @@ const CalendarModuleController = () => {
                         return;
                     }
 
-                    if (this.selectedDates.length === 1) {
+                    if (this.selectedDates.length == 1) {
                         s1 = new Date(this.selectedDates[0]);
                         const ymd1 = new Date(ymd);
 
@@ -353,7 +392,7 @@ const CalendarModuleController = () => {
                         } else {
                             this.selectedDates.push(ymd);
                         }
-                    } else if (this.selectedDates.length === 2) {
+                    } else if (this.selectedDates.length == 2) {
                         s1 = new Date(this.selectedDates[0]);
                         const ymd1 = new Date(ymd);
 
@@ -395,44 +434,45 @@ const CalendarModuleController = () => {
             return result;
         }
     };
+
+    return controller;
 };
 
-export function registerCalendar() {
+export function registerCalendar(config = {}) {
     if (!window.Alpine) {
         console.error('Alpine.js is not loaded. Please load Alpine.js first.');
         return null;
     }
 
     window.Alpine.data('calendar_entry', CalendarEntryController);
-    window.Alpine.data('calendar_module', CalendarModuleController);
+    window.Alpine.data('calendar_module', () => { return CalendarModuleController(config); });
 
-    return {
+    const result = {
         mount(el) {
-            if (typeof el === 'string') {
-                el = document.querySelector(el);
-            }
-
-            if (el) {
-                el.innerHTML = calendarTemplate;
-                // window.Alpine.initTree(el);
-            } else {
-                console.error('Cannot find target element.', el);
-            }
+            if (typeof el == 'string') { el = document.querySelector(el); }
+            if (!el) { console.error('Cannot find target element.', el); }
+            el.innerHTML = calendarTemplate;
+            // window.Alpine.initTree(el);
         },
-        getTemplate() {
-            return calendarTemplate;
-        }
+        getTemplate() { return calendarTemplate; }
     };
+
+    return result;
 }
 
+// 자동 마운트 - <div data-calendar-mount></div>
 if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
         if (window.Alpine) {
             document.querySelectorAll('[data-calendar-mount]').forEach(el => {
-                const calendar = registerCalendar();
-                if (calendar) {
-                    calendar.mount(el);
-                }
+                const config = {
+                    showCalendarCount: parseInt(el.dataset.calendarCount || '1', 10),
+                    selectMode: el.dataset.calendarSelectMode || 'single',
+                    availableDates: el.dataset.calendarAvailableDates ? JSON.parse(el.dataset.calendarAvailableDates) : []
+                };
+
+                const calendar = registerCalendar(config);
+                if (calendar) { calendar.mount(el); }
             });
         }
     });

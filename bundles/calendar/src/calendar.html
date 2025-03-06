@@ -45,49 +45,52 @@
     </p>
 
     <!-- Calendar entry Begin -->
-    <table x-data="calendar_entry" class="alpine-calendar-component__calendar" x-ref="calendarEntry">
-        <thead>
-            <tr>
-                <th colspan="7">
-                    <div class="alpine-calendar-component__tools">
-                        <!-- Previous month -->
-                        <button @click="gotoPrevMonth()">&larr;</button>
-
-                        <span x-text="monthName"></span>
-                        <span x-text="year"></span>
-
-                        <!-- Next month -->
-                        <button @click="gotoNextMonth()">&rarr;</button>
-                    </div>
-                </th>
-            </tr>
-            <tr>
-                <template x-for="header in grid.headersAbbreviated" :key="header">
-                    <th scope="col" x-text="header">
-                    </th>
-                </template>
-            </tr>
-        </thead>
-
-        <tbody>
-            <template x-for="(week, i) in grid.weeks" :key="i">
-                <tr>
-                    <template x-for="entry in week" :key="entry.id">
-                        <td>
-                            <button @click="selectEntry(entry)" :class="{
-                                        'current': entry.isCurrentMonth,
-                                        'other': entry.isOtherMonth,
-                                        'today': entry.isToday,
-                                        'weekday': entry.isWeekday,
-                                        'saturday': entry.isSaturday,
-                                        'sunday': entry.isSunday,
-                                        'selected': isSelected(entry)
-                                    }" :disabled="!getAvailable(entry)" x-text="entry.date">
-                            </button>
-                        </td>
+    <div x-data="calendar_entry" x-ref="calendarEntry" class="alpine-calendar-component__container">
+        <template x-for="(g, k) in grids" :key="k">
+        <table class="alpine-calendar-component__calendar">
+                <thead>
+                    <tr>
+                        <th colspan="7">
+                            <div class="alpine-calendar-component__tools">
+                                <button @click="gotoPrevMonth()">&larr;</button>
+                                <span x-text="monthNames[k]"></span>
+                                <span x-text="years[k]"></span>
+                                <button @click="gotoNextMonth()">&rarr;</button>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <!-- <template x-for="header in grid.headersAbbreviated" :key="header"> -->
+                        <template x-for="header in g.headersAbbreviated" :key="header">
+                            <th scope="col" x-text="header">
+                            </th>
+                        </template>
+                    </tr>
+                </thead>
+    
+                <tbody>
+                    <!-- <template x-for="(week, i) in grid.weeks" :key="i"> -->
+                    <template x-for="(week, i) in g.weeks" :key="i">
+                        <tr>
+                            <template x-for="entry in week" :key="entry.id">
+                                <td>
+                                    <button @click="selectEntry(entry)" :class="{
+                                            'current': entry.isCurrentMonth,
+                                            'other': entry.isOtherMonth,
+                                            'today': entry.isToday,
+                                            'weekday': entry.isWeekday,
+                                            'saturday': entry.isSaturday,
+                                            'sunday': entry.isSunday,
+                                            'selected': isSelected(entry)
+                                        }" :disabled="!getAvailable(entry)" x-text="entry.date">
+                                    </button>
+                                </td>
+                            </template>
+                        </tr>
                     </template>
-                </tr>
-            </template>
-        </tbody>
-    </table>
+                </tbody>
+            </table>
+        </template>
+    </div>
+    <!-- Calendar entry End -->
 </div>

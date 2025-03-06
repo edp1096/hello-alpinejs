@@ -2,6 +2,13 @@
 .alpine-calendar-component {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
+    // 캘린더 테이블 컨테이너
+    &__container {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
     // 캘린더 테이블
     &__calendar {
         background-color: #ffffff;
