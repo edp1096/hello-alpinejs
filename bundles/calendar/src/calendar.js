@@ -3,7 +3,7 @@ import calendarTemplate from './calendar.html';
 import './calendar.scss'; // SCSS 파일 임포트
 
 // 상수 정의
-const CALENDAR_WEEKDAYS = [
+let CALENDAR_WEEKDAYS = [
     "Sunday",
     "Monday",
     "Tuesday",
@@ -13,7 +13,7 @@ const CALENDAR_WEEKDAYS = [
     "Saturday"
 ];
 
-const CALENDAR_WEEKDAYS_SHORT = [
+let CALENDAR_WEEKDAYS_SHORT = [
     "Sun",
     "Mon",
     "Tue",
@@ -23,7 +23,7 @@ const CALENDAR_WEEKDAYS_SHORT = [
     "Sat"
 ];
 
-const CALENDAR_MONTHS = [
+let CALENDAR_MONTHS = [
     "January",
     "February",
     "March",
@@ -399,7 +399,7 @@ const CalendarModuleController = () => {
 
 export function registerCalendar() {
     if (!window.Alpine) {
-        console.error('Alpine.js가 로드되지 않았습니다. 먼저 Alpine.js를 로드해주세요.');
+        console.error('Alpine.js is not loaded. Please load Alpine.js first.');
         return null;
     }
 
@@ -416,7 +416,7 @@ export function registerCalendar() {
                 el.innerHTML = calendarTemplate;
                 // window.Alpine.initTree(el);
             } else {
-                console.error('대상 엘리먼트를 찾을 수 없습니다:', el);
+                console.error('Cannot find target element.', el);
             }
         },
         getTemplate() {
