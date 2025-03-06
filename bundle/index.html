@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine.js 카운터 예제</title>
+    <style>
+        /* 메인 페이지 스타일만 유지 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .counter-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .main-content {
+            margin: 30px 0;
+        }
+    </style>
+    <!-- 번들링된 CSS 파일 로드 -->
+    <link rel="stylesheet" href="./dist/counter-styles.css">
+</head>
+
+<body>
+    <h1>Alpine.js 컴포넌트 예제</h1>
+
+    <div class="main-content">
+        <p>이 예제는 Alpine.js를 사용하여 컴포넌트를 구현하고 esbuild로 번들링하는 방법을 보여줍니다.</p>
+        <p>아래 카운터는 별도의 JS 파일로 번들링된 컴포넌트입니다.</p>
+    </div>
+
+    <!-- 카운터 컴포넌트가 마운트될 요소 -->
+     <h2>카운터 수동 마운트</h2>
+    <div class="counter-container" id="counter-mount"></div>
+
+    <!-- 자동 마운트 예제 -->
+     <h2>카운터 자동 마운트</h2>
+    <div class="counter-container" data-counter-mount></div>
+
+    <div class="main-content">
+        <p>메인 페이지의 HTML은 간결하게 유지되고, 컴포넌트 로직과 템플릿은 모두 번들에 포함되어 있습니다.</p>
+        <p>위쪽은 JavaScript로 마운트한 예제, 아래쪽은 data-counter-mount 속성으로 자동 마운트한 예제입니다.</p>
+    </div>
+
+    <!-- Alpine.js 런타임 직접 로드 -->
+    <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
+
+    <!-- 번들된 컴포넌트 로드 (일반 스크립트) -->
+    <script src="./dist/counter-bundle.js"></script>
+
+    <!-- 컴포넌트 초기화 -->
+    <script>
+        // 페이지 로드 후 카운터 컴포넌트 수동 마운트
+        document.addEventListener('DOMContentLoaded', function () {
+            // CounterComponent는 전역 변수로 노출됨
+            if (CounterComponent) {
+                const counter = CounterComponent.registerCounter();
+                if (counter) {
+                    counter.mount('#counter-mount');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

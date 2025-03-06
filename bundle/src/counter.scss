@@ -1,0 +1,68 @@
+// src/counter.scss
+.alpine-counter-component {
+    // 컴포넌트 전체 래퍼
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+
+    // 카운터 표시 영역
+    &__display {
+        text-align: center;
+        margin-bottom: 15px;
+
+        h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #555;
+
+            span {
+                font-weight: bold;
+                color: #2c3e50;
+            }
+        }
+    }
+
+    // 컨트롤 버튼 영역
+    &__controls {
+        display: flex;
+        gap: 10px;
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+
+            &:hover {
+                background-color: #45a049;
+            }
+
+            &:active {
+                transform: translateY(1px);
+            }
+
+            &.decrement {
+                background-color: #f44336;
+
+                &:hover {
+                    background-color: #d32f2f;
+                }
+            }
+        }
+    }
+}

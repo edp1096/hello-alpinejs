@@ -1,0 +1,11 @@
+<!-- src/counter.html -->
+<div x-data="counter" class="alpine-counter-component">
+    <div class="alpine-counter-component__display">
+        <h3>카운터</h3>
+        <p>현재 값: <span x-text="count"></span></p>
+    </div>
+    <div class="alpine-counter-component__controls">
+        <button x-on:click="increment()">증가 (+)</button>
+        <button x-on:click="decrement()" class="decrement">감소 (-)</button>
+    </div>
+</div>
