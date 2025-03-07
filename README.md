@@ -2,7 +2,7 @@
 
 * Calendar source - https://github.com/bennadel/JavaScript-Demos/tree/master/demos/calendar-alpinejs
 * Component - shadowDOM에서 js 샌드박스 안된다. 관심두지 말것.
-* Bundles - 컴포넌트 번들링 예제
+* Bundles - Esbuild 이용한 컴포넌트 번들링 예제들
 ```sh
 cd bundle/slider
 yarn
