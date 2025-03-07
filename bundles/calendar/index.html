@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpine.js 캘린더 예제</title>
+    <title>Alpine.js calendar example</title>
+
+    <link rel="stylesheet" href="./dist/calendar-styles.css">
+
     <style>
-        /* 메인 페이지 스타일만 유지 */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
@@ -54,8 +56,6 @@
             background: transparent;
         }
     </style>
-    <!-- 번들링된 CSS 파일 로드 -->
-    <link rel="stylesheet" href="./dist/calendar-styles.css">
 </head>
 
 <body>
@@ -97,8 +97,8 @@
     </div>
 
     <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
-
     <script src="./dist/calendar-bundle.js"></script>
+
     <script>
         const datepickerContainer = {
             open: false,

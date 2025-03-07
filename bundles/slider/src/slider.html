@@ -1,0 +1,98 @@
+<!-- src/slider.html -->
+<div class="carousel-module-container" x-data="carouselController" x-init="init()">
+    <!-- Control panel -->
+    <template x-if="showControl">
+        <div class="carousel-options">
+            <div class="option-group">
+                <h3>트랜지션 효과</h3>
+                <label>
+                    <input type="radio" name="transition" value="slide" x-model="transitionType">
+                    슬라이드
+                </label>
+                <label>
+                    <input type="radio" name="transition" value="fade" x-model="transitionType">
+                    페이드
+                </label>
+            </div>
+
+            <div class="option-group">
+                <h3>자동 재생 설정</h3>
+                <label class="toggle-switch">
+                    <input type="checkbox" x-model="autoplayEnabled">
+                    <span>자동 재생</span>
+                </label>
+                <div class="interval-control" x-show="autoplayEnabled">
+                    <label>재생 간격 (초):
+                        <input type="range" min="1" max="10" x-model.number="interval">
+                        <span x-text="interval"></span>초
+                    </label>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <h3>트랜지션 속도</h3>
+                <label>
+                    페이드/슬라이드 속도:
+                    <input type="range" min="0.1" max="2" step="0.1" x-model.number="transitionDuration">
+                    <span x-text="transitionDuration"></span>초
+                </label>
+            </div>
+
+            <div class="option-group">
+                <h3>이미지 위치</h3>
+                <label>
+                    <input type="radio" name="imgPosition" value="top" x-model="imagePosition">
+                    상단 정렬
+                </label>
+                <label>
+                    <input type="radio" name="imgPosition" value="center" x-model="imagePosition">
+                    중앙 정렬
+                </label>
+                <label>
+                    <input type="radio" name="imgPosition" value="bottom" x-model="imagePosition">
+                    하단 정렬
+                </label>
+            </div>
+
+            <div class="option-group">
+                <h3>인디케이터 설정</h3>
+                <label class="toggle-switch">
+                    <input type="checkbox" x-model="showIndicators">
+                    <span>인디케이터 표시</span>
+                </label>
+            </div>
+        </div>
+    </template>
+
+    <div class="carousel-container">
+        <div class="carousel-inner" :style="transitionType == 'slide' ? 
+                    `transform: translateX(${-currentIndex * 100}%); transition: transform ${transitionDuration}s ease;` : 
+                    ''" :class="{'fade-transition': transitionType == 'fade'}">
+
+            <!-- Image slide -->
+            <template x-for="(image, index) in images" :key="index">
+                <div class="carousel-item" :class="{ 'active': currentIndex == index }" :style="getItemStyle()" @click="location.href = image.href">
+                    <img :class="'img-' + imagePosition" :src="image.src" :alt="image.alt || `슬라이드 이미지 ${index + 1}`">
+                </div>
+            </template>
+        </div>
+
+        <!-- Prev/Next -->
+        <button class="carousel-control prev" @click="prev()" aria-label="이전 슬라이드">
+            &#10094;
+        </button>
+        <button class="carousel-control next" @click="next()" aria-label="다음 슬라이드">
+            &#10095;
+        </button>
+
+        <!-- Indicator - 조건부 표시 추가 -->
+        <template x-if="showIndicators">
+            <div class="carousel-indicators">
+                <template x-for="(image, index) in images" :key="index">
+                    <div class="carousel-indicator" :class="{ 'active': currentIndex == index }" @click="goToSlide(index)">
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+</div>

@@ -92,7 +92,7 @@
             shroots.push(shrootCalendar)
 
             await loadScript("https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js", document.body, true)
-            if (typeof Alpine !== 'undefined') {
+            if (typeof Alpine != 'undefined') {
                 // for (const shroot of shroots) { Alpine.initTree(shroot) }
                 Alpine.initTree(shrootTodo)
                 Alpine.initTree(shrootCalendar)

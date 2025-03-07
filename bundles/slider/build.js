@@ -33,7 +33,6 @@ const livereloadScript = `
         });
 
         socket.addEventListener('close', function() {
-          // 재연결 시도
           if (reconnectAttempts < maxReconnectAttempts) {
             reconnectAttempts++;
             console.log(\`Connection is closed. Reconnecting (\${reconnectAttempts}/\${maxReconnectAttempts})...\`);
@@ -95,12 +94,12 @@ const emptyCssPlugin = {
 async function buildJS() {
     try {
         await esbuild.build({
-            entryPoints: ['src/counter.js'],
-            outfile: 'dist/counter-bundle.js',
+            entryPoints: ['src/slider.js'],
+            outfile: 'dist/slider-bundle.js',
             bundle: true,
             minify: true,
             format: 'iife',
-            globalName: 'CounterComponent',
+            globalName: 'SliderComponent',
             target: ['es2020'],
             plugins: [
                 htmlImportPlugin,
@@ -123,8 +122,8 @@ async function buildJS() {
 async function buildCSS() {
     try {
         await esbuild.build({
-            entryPoints: ['src/counter.scss'],
-            outfile: 'dist/counter-styles.css',
+            entryPoints: ['src/slider.scss'],
+            outfile: 'dist/slider-styles.css',
             bundle: true,
             minify: true,
             plugins: [

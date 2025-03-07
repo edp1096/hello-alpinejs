@@ -1,9 +1,9 @@
 {
-    "name": "alpine-calendar-component",
+    "name": "alpine-slider-component",
     "version": "0.0.1",
     "license": "UNLICENSED",
-    "description": "Alpine.js 캘린더 컴포넌트",
-    "main": "dist/calendar-bundle.js",
+    "description": "Alpine.js 이미지 슬라이더 컴포넌트",
+    "main": "dist/slider-bundle.js",
     "scripts": {
         "build": "node build.js",
         "watch": "node build.js --watch"

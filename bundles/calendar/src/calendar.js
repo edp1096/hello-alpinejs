@@ -1,8 +1,7 @@
 // src/calendar.js
 import calendarTemplate from './calendar.html';
-import './calendar.scss'; // SCSS 파일 임포트
+import './calendar.scss';
 
-// 상수 정의
 let CALENDAR_WEEKDAYS = [
     "Sunday",
     "Monday",
@@ -253,6 +252,7 @@ const CalendarModuleController = (config = {}) => {
                 this.updateShowMonthCount(this.showCalendarCount)
             }
         },
+
         createRandomAvailableDates() {
             const today = new Date();
             const year = today.getFullYear();
@@ -379,7 +379,7 @@ const CalendarModuleController = (config = {}) => {
                     const ymd = getYmdFromEntry(entry);
 
                     if (this.selectedDates.includes(ymd)) {
-                        this.selectedDates = this.selectedDates.filter((item) => item !== ymd);
+                        this.selectedDates = this.selectedDates.filter((item) => item != ymd);
                         return;
                     }
 
@@ -452,7 +452,7 @@ export function registerCalendar(config = {}) {
             if (typeof el == 'string') { el = document.querySelector(el); }
             if (!el) { console.error('Cannot find target element.', el); }
             el.innerHTML = calendarTemplate;
-            // window.Alpine.initTree(el);
+            // window.Alpine.nextTick(() => { window.Alpine.initTree(el); }); // Must not be used
         },
         getTemplate() { return calendarTemplate; }
     };
@@ -461,7 +461,7 @@ export function registerCalendar(config = {}) {
 }
 
 // 자동 마운트 - <div data-calendar-mount></div>
-if (typeof document !== 'undefined') {
+if (typeof document != 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
         if (window.Alpine) {
             document.querySelectorAll('[data-calendar-mount]').forEach(el => {
