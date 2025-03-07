@@ -4,7 +4,7 @@
 * Component - shadowDOM에서 js 샌드박스 안된다. 관심두지 말것.
 * Bundles - 컴포넌트 번들링 예제
 ```sh
-cd bundle
+cd bundle/slider
 yarn
 yarn watch
 # or
