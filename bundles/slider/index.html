@@ -90,7 +90,8 @@ const sliderConfig = {
         { src: "img2.jpg", alt: "내 이미지 2", href: "http://www.example.org" }
     ]
 };
-const sliderCustom = SliderComponent.registerSlider(sliderConfig);
+const slider = SliderComponent.registerSlider(sliderConfig);
+if (slider) { slider.mount('#slider-custom'); }
             </code>
         </pre>
     </div>
