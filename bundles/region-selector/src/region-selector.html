@@ -1,0 +1,49 @@
+<!-- src/region-selector.html -->
+<div x-data="regionSelector" class="region-selector">
+    <!-- 선택된 지역 표시 버튼 -->
+    <button @click="toggleDropdown()" class="region-selector__button" :class="{ 'is-active': isOpen }">
+        <span x-text="displayText"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="region-selector__arrow" :class="{ 'rotate': isOpen }">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </button>
+
+    <!-- 드롭다운 메뉴 -->
+    <div x-show="isOpen" @click.outside="closeDropdown()" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" class="region-selector__dropdown">
+        <div @click="selectAllRegions()" class="region-selector__header region-selector__all-regions">전체 지역</div>
+
+        <div class="region-selector__content">
+            <!-- 시/도 목록 -->
+            <div class="region-selector__cities">
+                <template x-for="city in cities" :key="city.id">
+                    <div @click="selectCity(city)" class="region-selector__item" :class="{ 'is-selected': selectedCity && selectedCity.id === city.id }">
+                        <span x-text="city.name"></span>
+                        <span class="region-selector__count" x-text="`(${city.count})`"></span>
+                        <svg class="region-selector__chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </template>
+            </div>
+
+            <!-- 군/구 목록 -->
+            <div class="region-selector__districts">
+                <template x-if="selectedCity">
+                    <div>
+                        <div @click="selectDistrict({id: 'all', name: selectedCity.name + ' 전체', count: selectedCity.count})" class="region-selector__item" :class="{ 'is-selected': selectedDistrict && selectedDistrict.id === 'all' }">
+                            <span x-text="selectedCity.name + ' 전체'"></span>
+                            <span class="region-selector__count" x-text="`(${selectedCity.count})`"></span>
+                        </div>
+
+                        <template x-for="district in filteredDistricts" :key="district.id">
+                            <div @click="selectDistrict(district)" class="region-selector__item" :class="{ 'is-selected': selectedDistrict && selectedDistrict.id === district.id }">
+                                <span x-text="district.name"></span>
+                                <span class="region-selector__count" x-text="`(${district.count})`"></span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지역 선택기 커스텀 태그 예제</title>
+
+    <link rel="stylesheet" href="./dist/region-selector-styles.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .selector-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0 10px 0;
+        }
+
+        .main-content {
+            margin: 30px 0;
+        }
+
+        .region-selection-result {
+            margin: 0 0 20px 0;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-left: 3px solid #2563eb;
+            font-size: 14px;
+        }
+
+        .selector-examples {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .selector-example {
+            flex: 1;
+            min-width: 300px;
+            background-color: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .selector-example h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        pre {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>지역 선택기 커스텀 태그 예제</h1>
+
+    <div class="main-content">
+        <p>이 예제는 Alpine.js를 사용하여 지역 선택기 컴포넌트를 커스텀 HTML 태그로 사용하는 방법을 보여줍니다.</p>
+        <p>&lt;region-selector&gt; 태그를 선언적으로 사용하여 지역 선택기를 쉽게 추가할 수 있습니다.</p>
+    </div>
+
+    <!-- 기본 지역 선택기 사용법 -->
+    <h2>기본 선택기</h2>
+    <region-selector id="default-selector"></region-selector>
+    <div class="region-selection-result" data-result-for="default-selector">선택된 지역이 여기에 표시됩니다.</div>
+
+    <!-- 사용자 정의 지역 선택기 - 사용자 지정 플레이스홀더 -->
+    <h2>커스텀 선택기</h2>
+    <region-selector id="custom-selector" placeholder-text="어디로 떠나실 건가요?"></region-selector>
+    <div class="region-selection-result" data-result-for="custom-selector">선택된 지역이 여기에 표시됩니다.</div>
+
+    <div class="selector-examples">
+        <div class="selector-example">
+            <h3>기본 사용법</h3>
+            <pre><code>&lt;region-selector id="selector-id"&gt;&lt;/region-selector&gt;</code></pre>
+            <p>페이지에 선택기를 추가하는 가장 간단한 방법입니다.</p>
+        </div>
+
+        <div class="selector-example">
+            <h3>선택 이벤트 처리</h3>
+            <pre><code>document.querySelector('#selector-id')
+  .addEventListener('region-selected', (e) => {
+    console.log(e.detail);
+    // { city: {...}, district: {...} }
+  });</code></pre>
+            <button onclick="getSelectedRegion()">현재 선택된 지역 확인</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h2>JavaScript API</h2>
+        <pre><code>// 전역 데이터 설정
+regionSelector.setGlobalData(cities, districts);
+
+// 특정 선택기에 데이터 설정
+regionSelector.setData('selector-id', cities, districts);
+
+// 선택된 지역 가져오기
+const element = document.querySelector('#selector-id');
+const selectedRegion = element.getSelectedRegion();
+
+// 프로그래매틱하게 지역 설정하기
+element.setSelectedRegion(city, district);</code></pre>
+    </div>
+
+    <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
+    <script src="./dist/region-selector-bundle.js"></script>
+
+    <script>
+        // 지역 데이터 설정
+        const cities = [
+            { id: '서울', name: '서울', count: 458 },
+            { id: 'busan', name: '부산', count: 357 },
+            { id: 'incheon', name: '인천', count: 198 },
+            { id: 'daegu', name: '대구', count: 156 },
+            { id: 'daejeon', name: '대전', count: 94 },
+            { id: 'gwangju', name: '광주', count: 87 },
+            { id: 'ulsan', name: '울산', count: 76 },
+            { id: 'sejong', name: '세종', count: 32 },
+            { id: 'gyeonggi', name: '경기', count: 512 },
+            { id: 'gangwon', name: '강원', count: 183 },
+            { id: 'chungbuk', name: '충북', count: 115 },
+            { id: 'chungnam', name: '충남', count: 142 },
+            { id: 'jeonbuk', name: '전북', count: 128 },
+            { id: 'jeonnam', name: '전남', count: 154 },
+            { id: 'gyeongbuk', name: '경북', count: 178 },
+            { id: 'gyeongnam', name: '경남', count: 205 },
+            { id: 'jeju', name: '제주', count: 172 }
+        ];
+
+        const districts = [
+            // 서울
+            { id: 'seoul-gangnam', cityId: '서울', name: '강남구', count: 87 },
+            { id: 'seoul-gangdong', cityId: '서울', name: '강동구', count: 45 },
+            { id: 'seoul-gangbuk', cityId: '서울', name: '강북구', count: 32 },
+            { id: 'seoul-gangseo', cityId: '서울', name: '강서구', count: 41 },
+            { id: 'seoul-gwanak', cityId: '서울', name: '관악구', count: 38 },
+            // 부산
+            { id: 'busan-jung', cityId: 'busan', name: '중구', count: 41 },
+            { id: 'busan-seo', cityId: 'busan', name: '서구', count: 29 },
+            { id: 'busan-dong', cityId: 'busan', name: '동구', count: 35 },
+            { id: 'busan-yeongdo', cityId: 'busan', name: '영도구', count: 27 },
+            { id: 'busan-busanjin', cityId: 'busan', name: '부산진구', count: 52 },
+            { id: 'busan-haeundae', cityId: 'busan', name: '해운대구', count: 106 },
+            // 인천
+            { id: 'incheon-jung', cityId: 'incheon', name: '중구', count: 26 },
+            { id: 'incheon-dong', cityId: 'incheon', name: '동구', count: 19 },
+            { id: 'incheon-nam', cityId: 'incheon', name: '남구', count: 31 },
+            { id: 'incheon-yeonsu', cityId: 'incheon', name: '연수구', count: 42 },
+            // 대구
+            { id: 'daegu-jung', cityId: 'daegu', name: '중구', count: 28 },
+            { id: 'daegu-dong', cityId: 'daegu', name: '동구', count: 31 },
+            { id: 'daegu-seo', cityId: 'daegu', name: '서구', count: 25 },
+            { id: 'daegu-nam', cityId: 'daegu', name: '남구', count: 22 },
+            { id: 'daegu-buk', cityId: 'daegu', name: '북구', count: 29 },
+            { id: 'daegu-suseong', cityId: 'daegu', name: '수성구', count: 32 }
+        ];
+
+        // 먼저 전역 데이터 설정 (초기화 전에)
+        window.regionSelectorGlobalData = {
+            cities: cities,
+            districts: districts,
+            placeholderText: '지역을 선택해주세요' // 기본 플레이스홀더 설정
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.RegionSelectorComponent) {
+                // 커스텀 엘리먼트 정의 확인/강제 적용
+                window.RegionSelectorComponent.defineCustomElement();
+
+                // 컴포넌트 초기화
+                const controller = window.RegionSelectorComponent.registerRegionSelector({
+                    cities: cities,
+                    districts: districts
+                });
+
+                // 전역 데이터 설정 (초기화 후에도 다시 설정)
+                if (window.regionSelector) {
+                    window.regionSelector.setGlobalData(cities, districts);
+                    // console.log("Region selector data set");
+                }
+
+                // 각 선택기에 대한 이벤트 리스너 설정
+                document.querySelectorAll('region-selector').forEach(element => {
+                    element.addEventListener('region-selected', function (e) {
+                        // selectorId가 있으면 사용하고, 없으면 요소의 id 사용
+                        const selectorId = e.detail.selectorId || element.id;
+                        // 해당 결과 요소 찾기 (data-result-for 속성으로)
+                        const resultElement = document.querySelector(`.region-selection-result[data-result-for="${selectorId}"]`);
+
+                        // 결과 요소를 찾지 못했다면 id로 다시 시도
+                        if (!resultElement && element.getAttribute('selector-id')) {
+                            // selector-id 속성이 있으면 그것으로도 시도
+                            const altSelectorId = element.getAttribute('selector-id');
+                            const altResultElement = document.querySelector(`.region-selection-result[data-result-for="${altSelectorId}"]`);
+
+                            if (altResultElement) {
+                                updateResultElement(altResultElement, e.detail);
+                            }
+                        } else if (resultElement) {
+                            updateResultElement(resultElement, e.detail);
+                        }
+
+                        console.log('Region selected:', e.detail);
+                    });
+
+                    // onRegionSelected 콜백 설정 (다른 방법)
+                    element.onRegionSelected = function (data) {
+                        console.log('onRegionSelected callback:', data);
+                    };
+                });
+
+                // 결과 요소 업데이트 함수
+                function updateResultElement(element, data) {
+                    if (data.city && data.district) {
+                        element.innerHTML = `<strong>선택된 지역:</strong> ${data.city.name} > ${data.district.name} (${data.district.count}개 숙소)`;
+                    } else if (data.city) {
+                        element.innerHTML = `<strong>선택된 지역:</strong> ${data.city.name} (${data.city.count}개 숙소)`;
+                    } else {
+                        element.innerHTML = '<strong>선택된 지역:</strong> 전체 지역';
+                    }
+                }
+            }
+        });
+
+        // 현재 선택된 지역 정보 가져오기
+        function getSelectedRegion() {
+            const selector = document.querySelector('#default-selector');
+            if (selector && typeof selector.getSelectedRegion === 'function') {
+                const region = selector.getSelectedRegion();
+                alert(region.city
+                    ? (region.district
+                        ? `${region.city.name} > ${region.district.name}`
+                        : `${region.city.name}`)
+                    : '전체 지역');
+            } else {
+                alert('선택기가 초기화되지 않았습니다.');
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,230 @@
+// src/region-selector.scss
+
+// 변수 정의
+$rs-primary-color: #2563eb;
+$rs-primary-hover: #1d4ed8;
+$rs-border-color: #d1d5db;
+$rs-border-hover: #9ca3af;
+$rs-text-color: #1f2937;
+$rs-text-light: #4b5563;
+$rs-text-muted: #6b7280;
+$rs-light-hover: #f3f4f6;
+$rs-selected-bg: #eff6ff;
+
+// 격리된 스타일 - region-selector 태그에 적용
+region-selector {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+    // 버튼 요소 스타일
+    .region-selector__button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 10px 16px;
+        background-color: #fff !important; // !important로 외부 스타일 덮어쓰기
+        border: 1px solid $rs-border-color;
+        border-radius: 6px;
+        font-size: 14px;
+        color: $rs-text-color;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $rs-border-hover !important;
+            background-color: #fff !important; // 외부 호버 배경색 방지
+        }
+
+        &.is-active {
+            border-color: $rs-primary-color;
+            box-shadow: 0 0 0 1px $rs-primary-color;
+        }
+    }
+
+    // 화살표 아이콘
+    .region-selector__arrow {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.2s;
+
+        &.rotate {
+            transform: rotate(-180deg);
+        }
+    }
+
+    // 드롭다운 메뉴
+    .region-selector__dropdown {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        width: 500px;
+        background-color: #fff;
+        border-radius: 6px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        z-index: 100; // 높은 z-index로 다른 요소 위에 표시
+    }
+
+    // 헤더 영역
+    .region-selector__header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    // 전체 지역 선택 버튼
+    .region-selector__all-regions {
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: $rs-light-hover;
+        }
+    }
+
+    // 콘텐츠 영역
+    .region-selector__content {
+        display: flex;
+        max-height: 400px;
+    }
+
+    // 시/도 및 군/구 영역
+    .region-selector__cities,
+    .region-selector__districts {
+        flex: 1;
+        overflow-y: auto;
+        max-height: 400px;
+    }
+
+    // 시/도 영역
+    .region-selector__cities {
+        border-right: 1px solid #e5e7eb;
+    }
+
+    // 각 항목
+    .region-selector__item {
+        display: flex;
+        align-items: center;
+        padding: 10px 16px;
+        font-size: 14px;
+        color: $rs-text-light;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: $rs-light-hover;
+            color: $rs-text-color;
+        }
+
+        &.is-selected {
+            background-color: $rs-selected-bg;
+            color: $rs-primary-color;
+            font-weight: 500;
+        }
+    }
+
+    // 숙소 수 표시
+    .region-selector__count {
+        margin-left: 4px;
+        color: $rs-text-muted;
+        font-size: 12px;
+    }
+
+    // 오른쪽 화살표
+    .region-selector__chevron {
+        width: 16px;
+        height: 16px;
+        margin-left: auto;
+    }
+
+    // 스크롤바 스타일링
+    .region-selector__cities,
+    .region-selector__districts {
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+
+            &:hover {
+                background: #9ca3af;
+            }
+        }
+    }
+
+    // 반응형 스타일
+    @media (max-width: 576px) {
+        .region-selector__dropdown {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .region-selector__content {
+            flex-direction: column;
+        }
+
+        .region-selector__cities {
+            border-right: none;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .region-selector__cities,
+        .region-selector__districts {
+            max-height: 200px;
+        }
+    }
+
+    // 트랜지션 효과 클래스
+    .transition {
+        transition-property: opacity, transform;
+    }
+
+    .ease-out {
+        transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .duration-200 {
+        transition-duration: 200ms;
+    }
+
+    .opacity-0 {
+        opacity: 0;
+    }
+
+    .opacity-100 {
+        opacity: 1;
+    }
+
+    .transform {
+        --transform-translate-x: 0;
+        --transform-translate-y: 0;
+        --transform-rotate: 0;
+        --transform-skew-x: 0;
+        --transform-skew-y: 0;
+        --transform-scale-x: 1;
+        --transform-scale-y: 1;
+        transform: translateX(var(--transform-translate-x)) translateY(var(--transform-translate-y)) rotate(var(--transform-rotate)) skewX(var(--transform-skew-x)) skewY(var(--transform-skew-y)) scaleX(var(--transform-scale-x)) scaleY(var(--transform-scale-y));
+    }
+
+    .scale-95 {
+        --transform-scale-x: .95;
+        --transform-scale-y: .95;
+    }
+
+    .scale-100 {
+        --transform-scale-x: 1;
+        --transform-scale-y: 1;
+    }
+}
