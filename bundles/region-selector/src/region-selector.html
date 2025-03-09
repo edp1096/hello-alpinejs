@@ -16,7 +16,7 @@
             <!-- 시/도 목록 -->
             <div class="region-selector__cities">
                 <template x-for="city in cities" :key="city.id">
-                    <div @click="selectCity(city)" class="region-selector__item" :class="{ 'is-selected': selectedCity && selectedCity.id === city.id }">
+                    <div @click="selectCity(city)" class="region-selector__item" :class="{ 'is-selected': selectedCity && selectedCity.id == city.id }">
                         <span x-text="city.name"></span>
                         <span class="region-selector__count" x-text="`(${city.count})`"></span>
                         <svg class="region-selector__chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -30,13 +30,13 @@
             <div class="region-selector__districts">
                 <template x-if="selectedCity">
                     <div>
-                        <div @click="selectDistrict({id: 'all', name: selectedCity.name + ' 전체', count: selectedCity.count})" class="region-selector__item" :class="{ 'is-selected': selectedDistrict && selectedDistrict.id === 'all' }">
+                        <div @click="selectDistrict({id: 'all', name: selectedCity.name + ' 전체', count: selectedCity.count})" class="region-selector__item" :class="{ 'is-selected': selectedDistrict && selectedDistrict.id == 'all' }">
                             <span x-text="selectedCity.name + ' 전체'"></span>
                             <span class="region-selector__count" x-text="`(${selectedCity.count})`"></span>
                         </div>
 
                         <template x-for="district in filteredDistricts" :key="district.id">
-                            <div @click="selectDistrict(district)" class="region-selector__item" :class="{ 'is-selected': selectedDistrict && selectedDistrict.id === district.id }">
+                            <div @click="selectDistrict(district)" class="region-selector__item" :class="{ 'is-selected': selectedDistrict && selectedDistrict.id == district.id }">
                                 <span x-text="district.name"></span>
                                 <span class="region-selector__count" x-text="`(${district.count})`"></span>
                             </div>

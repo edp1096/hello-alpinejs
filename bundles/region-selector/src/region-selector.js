@@ -62,7 +62,7 @@ export function registerRegionSelector(config = {}) {
 
             // 이벤트 리스너 설정
             this.addEventListener('region-selected', (event) => {
-                if (typeof this.onRegionSelected === 'function') {
+                if (typeof this.onRegionSelected == 'function') {
                     this.onRegionSelected(event.detail);
                 }
             });
@@ -99,7 +99,7 @@ export function registerRegionSelector(config = {}) {
 
     // 커스텀 요소 등록 함수 - 필요시 직접 호출
     const registerCustomElement = () => {
-        if (typeof customElements !== 'undefined' && !customElements.get('region-selector')) {
+        if (typeof customElements != 'undefined' && !customElements.get('region-selector')) {
             customElements.define('region-selector', RegionSelectorElement);
             // console.log('region-selector custom element defined');
             return true;
@@ -126,11 +126,6 @@ export function registerRegionSelector(config = {}) {
                 }
             }
 
-            // 전역 데이터가 있으면 사용
-            if (window.regionSelectorGlobalData && window.regionSelectorGlobalData.cities) {
-                return window.regionSelectorGlobalData.cities;
-            }
-
             return this.config.cities || [];
         },
 
@@ -141,11 +136,6 @@ export function registerRegionSelector(config = {}) {
                 if (customConfig && customConfig.districts) {
                     return customConfig.districts;
                 }
-            }
-
-            // 전역 데이터가 있으면 사용
-            if (window.regionSelectorGlobalData && window.regionSelectorGlobalData.districts) {
-                return window.regionSelectorGlobalData.districts;
             }
 
             return this.config.districts || [];
@@ -192,7 +182,7 @@ export function registerRegionSelector(config = {}) {
         // 선택된 시/도에 맞는 군/구 필터링
         get filteredDistricts() {
             if (!this.selectedCity) return [];
-            return this.districts.filter(district => district.cityId === this.selectedCity.id);
+            return this.districts.filter(district => district.cityId == this.selectedCity.id);
         },
 
         // 드롭다운 토글
@@ -223,7 +213,7 @@ export function registerRegionSelector(config = {}) {
             this.$el.dispatchEvent(selectedEvent);
 
             // 콜백 함수가 있다면 호출
-            if (typeof this.config.onSelect === 'function') {
+            if (typeof this.config.onSelect == 'function') {
                 this.config.onSelect({
                     city: this.selectedCity,
                     district: null,
@@ -249,7 +239,7 @@ export function registerRegionSelector(config = {}) {
             this.$el.dispatchEvent(selectedEvent);
 
             // 콜백 함수가 있다면 호출
-            if (typeof this.config.onSelect === 'function') {
+            if (typeof this.config.onSelect == 'function') {
                 this.config.onSelect({
                     city: this.selectedCity,
                     district: district,
@@ -276,7 +266,7 @@ export function registerRegionSelector(config = {}) {
             this.$el.dispatchEvent(selectedEvent);
 
             // 콜백 함수가 있다면 호출
-            if (typeof this.config.onSelect === 'function') {
+            if (typeof this.config.onSelect == 'function') {
                 this.config.onSelect({
                     city: null,
                     district: null,
@@ -305,7 +295,7 @@ export function registerRegionSelector(config = {}) {
 
     return {
         mount(el) {
-            if (typeof el === 'string') {
+            if (typeof el == 'string') {
                 el = document.querySelector(el);
             }
 
@@ -326,14 +316,4 @@ export function registerRegionSelector(config = {}) {
 }
 
 // 전역 객체 등록
-window.RegionSelectorComponent = {
-    registerRegionSelector,
-    // 커스텀 태그 정의 함수
-    defineCustomElement: () => {
-        if (!customElements.get('region-selector') && RegionSelectorElement) {
-            customElements.define('region-selector', RegionSelectorElement);
-            return true;
-        }
-        return false;
-    }
-};
+window.RegionSelectorComponent = { registerRegionSelector };
