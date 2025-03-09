@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine.js 드롭다운 예제</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./dist/dropdown-styles.css">
+
+    <style>
+        :root {
+            --first-color: hsl(225, 72%, 55%);
+            --container-color: hsl(225, 75%, 97%);
+            --body-font: 'Montserrat', sans-serif;
+            --normal-font-size: 1rem;
+        }
+
+        body {
+            font-family: var(--body-font, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif);
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .dropdown-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .main-content {
+            margin: 30px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Alpine.js 드롭다운 컴포넌트 예제</h1>
+
+    <div class="main-content">
+        <p>이 예제는 Alpine.js를 사용하여 드롭다운 컴포넌트를 구현하고 esbuild로 번들링하는 방법을 보여줍니다.</p>
+        <p>아래 드롭다운은 별도의 JS 파일로 번들링된 컴포넌트입니다.</p>
+    </div>
+
+    <h2>드롭다운 수동 마운트 (커스텀 옵션)</h2>
+    <div class="dropdown-container" id="dropdown-mount"></div>
+
+    <h2>드롭다운 자동 마운트 (기본 옵션)</h2>
+    <div class="dropdown-container" data-dropdown-mount></div>
+
+    <div class="main-content">
+        <p>위쪽은 JavaScript로 마운트하고 커스텀 옵션을 지정한 예제, 아래쪽은 data-dropdown-mount 속성으로 자동 마운트한 예제입니다.</p>
+    </div>
+
+    <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
+    <script src="./dist/dropdown-bundle.js"></script>
+
+    <script>
+        const dropdownConfig = {
+            options: [
+                { name: '내 프로필', icon: 'ri-user-3-line' },
+                { name: '메시지', icon: 'ri-message-3-line' },
+                { name: '계정', icon: 'ri-lock-line' },
+                { name: '설정', icon: 'ri-settings-3-line' },
+                { name: '로그아웃', icon: 'ri-logout-box-line' }
+            ],
+            defaultOption: { name: '내 프로필', icon: 'ri-user-3-line' },
+            onSelect: (option) => {
+                console.log('선택된 옵션:', option);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (DropdownComponent) {
+                const dropdown = DropdownComponent.registerDropdown(dropdownConfig);
+                if (dropdown) { dropdown.mount('#dropdown-mount'); }
+            }
+        });
+    </script>
+</body>
+
+</html>
