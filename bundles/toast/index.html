@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine.js Toast Notification 예제</title>
+
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="./dist/toast-styles.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .control-panel {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .success-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .error-btn {
+            background-color: #F44336;
+            color: white;
+        }
+
+        .warning-btn {
+            background-color: #FFC107;
+            color: #333;
+        }
+
+        .info-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .main-content {
+            margin: 30px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Alpine.js Toast Notification 컴포넌트 예제</h1>
+
+    <div class="main-content">
+        <p>이 예제는 Alpine.js를 사용하여 Toast Notification 컴포넌트를 구현하는 방법을 보여줍니다.</p>
+        <p>아래 컨트롤 패널을 사용하여 다양한 종류의 토스트 메시지를 표시할 수 있습니다.</p>
+    </div>
+
+    <div class="control-panel">
+        <div class="form-group">
+            <label for="toast-title">제목</label>
+            <input type="text" id="toast-title" placeholder="토스트 제목">
+        </div>
+
+        <div class="form-group">
+            <label for="toast-message">메시지</label>
+            <textarea id="toast-message" rows="2" placeholder="토스트 내용"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="toast-duration">지속 시간 (ms)</label>
+            <input type="number" id="toast-duration" value="3000" min="1000" step="500">
+        </div>
+
+        <div class="form-group">
+            <label for="toast-position">위치</label>
+            <select id="toast-position">
+                <option value="top-right">오른쪽 상단</option>
+                <option value="top-left">왼쪽 상단</option>
+                <option value="top-center">상단 중앙</option>
+                <option value="bottom-right">오른쪽 하단</option>
+                <option value="bottom-left">왼쪽 하단</option>
+                <option value="bottom-center">하단 중앙</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>옵션</label>
+            <div>
+                <input type="checkbox" id="toast-closable" checked>
+                <label for="toast-closable" style="display: inline;">닫기 버튼 표시</label>
+            </div>
+            <div>
+                <input type="checkbox" id="toast-progress" checked>
+                <label for="toast-progress" style="display: inline;">진행 표시줄 표시</label>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="success-btn" onclick="showToast('success')">성공 메시지</button>
+            <button class="error-btn" onclick="showToast('error')">오류 메시지</button>
+            <button class="warning-btn" onclick="showToast('warning')">경고 메시지</button>
+            <button class="info-btn" onclick="showToast('info')">정보 메시지</button>
+        </div>
+    </div>
+
+    <!-- 토스트 컨테이너 마운트 -->
+    <div data-toast-mount></div>
+
+    <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
+    <script src="./dist/toast-bundle.js"></script>
+
+    <script>
+        // 토스트 설정
+        const toastConfig = {
+            position: 'top-right',
+            duration: 3000,
+            maxToasts: 5
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 수동 마운트 예제 (여기서는 data-toast-mount 속성을 사용하여 자동 마운트)
+            if (ToastComponent) {
+                ToastComponent.registerToast(toastConfig);
+            }
+        });
+
+        function showToast(type) {
+            const title = document.getElementById('toast-title').value || null;
+            const message = document.getElementById('toast-message').value || '이것은 토스트 메시지입니다.';
+            const duration = parseInt(document.getElementById('toast-duration').value) || 3000;
+            const position = document.getElementById('toast-position').value;
+            const closable = document.getElementById('toast-closable').checked;
+            const showProgress = document.getElementById('toast-progress').checked;
+
+            if (window.toast) {
+                // 선택한 토스트 위치 업데이트
+                const toastContainer = document.querySelector('.toast-container');
+                if (toastContainer) {
+                    // 기존 위치 클래스 제거
+                    toastContainer.classList.remove(
+                        'top-right', 'top-left', 'top-center',
+                        'bottom-right', 'bottom-left', 'bottom-center'
+                    );
+                    // 새 위치 클래스 추가
+                    toastContainer.classList.add(position);
+                }
+
+                // 토스트 표시
+                window.toast[type](message, {
+                    title,
+                    duration,
+                    closable,
+                    showProgress
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>

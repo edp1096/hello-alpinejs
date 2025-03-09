@@ -1,0 +1,26 @@
+<!-- src/toast.html -->
+<div x-data="toast" class="toast-container" :class="position">
+    <template x-for="(item, index) in items" :key="index">
+        <div class="toast-item" :class="item.type" x-show="item.visible" x-transition:enter="toast-enter" x-transition:enter-start="toast-enter-start" x-transition:enter-end="toast-enter-end" x-transition:leave="toast-leave" x-transition:leave-start="toast-leave-start" x-transition:leave-end="toast-leave-end">
+
+            <div class="toast-content">
+                <i x-show="item.type === 'success'" class="ri-check-line toast-icon"></i>
+                <i x-show="item.type === 'error'" class="ri-error-warning-line toast-icon"></i>
+                <i x-show="item.type === 'warning'" class="ri-alert-line toast-icon"></i>
+                <i x-show="item.type === 'info'" class="ri-information-line toast-icon"></i>
+
+                <div class="toast-message">
+                    <span class="toast-title" x-text="item.title"></span>
+                    <span class="toast-description" x-text="item.message"></span>
+                </div>
+            </div>
+
+            <button x-show="item.closable" class="toast-close" @click="removeToast(index)">
+                <i class="ri-close-line"></i>
+            </button>
+
+            <div x-show="item.showProgress" class="toast-progress" :style="`width: ${item.progress}%`">
+            </div>
+        </div>
+    </template>
+</div>
