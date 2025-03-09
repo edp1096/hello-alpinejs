@@ -22,7 +22,7 @@
                     <span>자동 재생</span>
                 </label>
                 <div class="interval-control" x-show="autoplayEnabled">
-                    <label>재생 간격 (초):
+                    <label>
                         <input type="range" min="1" max="10" x-model.number="interval">
                         <span x-text="interval"></span>초
                     </label>
@@ -32,7 +32,6 @@
             <div class="option-group">
                 <h3>트랜지션 속도</h3>
                 <label>
-                    페이드/슬라이드 속도:
                     <input type="range" min="0.1" max="2" step="0.1" x-model.number="transitionDuration">
                     <span x-text="transitionDuration"></span>초
                 </label>

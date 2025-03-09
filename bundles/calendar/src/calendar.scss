@@ -1,6 +1,14 @@
 // src/calendar.scss
 .alpine-calendar-component {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+
+    // 모든 하위 요소에 대한 box-sizing 적용
+    *,
+    *::before,
+    *::after {
+        box-sizing: inherit;
+    }
 
     // 캘린더 테이블 컨테이너
     &__container {
@@ -25,13 +33,17 @@
             border: 1px solid #333333;
             padding: 0;
 
-            button {
+            // 날짜 버튼 스타일 - 더 구체적인 선택자 사용
+            .alpine-calendar-component__date-btn {
                 border: none;
                 background-color: #bdebff;
                 cursor: pointer;
                 display: block;
                 padding: 10px 15px;
                 width: 100%;
+                margin: 0;
+                border-radius: 0;
+                color: #333; // 기본 텍스트 색상 지정
 
                 &.saturday {
                     color: #4f7bcb;
@@ -53,6 +65,8 @@
 
                 &:disabled {
                     color: #bbb;
+                    background-color: #f0f0f0;
+                    cursor: not-allowed;
                 }
 
                 &.selected,
@@ -68,15 +82,17 @@
         align-items: center;
         display: flex;
         justify-content: center;
-        gap: 20px;
+        gap: 10px;
 
-        button {
+        // 툴바 버튼 스타일
+        .alpine-calendar-component__tool-btn {
             background-color: transparent;
             border: 1px solid #0095d1;
             border-radius: 3px;
             color: #0095d1;
             cursor: pointer;
             padding: 5px 9px;
+            margin: 0;
 
             &:first-of-type {
                 margin-right: auto;
@@ -85,6 +101,43 @@
             &:last-of-type {
                 margin-left: auto;
             }
+
+            &:disabled {
+                color: #bbb;
+                border-color: #ddd;
+                background-color: #f5f5f5;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    // 드롭다운 선택 상자 스타일
+    &__select {
+        background-color: #ffffff;
+        border: 1px solid #0095d1;
+        border-radius: 3px;
+        color: #0095d1;
+        padding: 3px 5px;
+        margin: 0 2px;
+        font-size: 14px;
+        cursor: pointer;
+        min-width: 80px;
+
+        &:focus {
+            outline: none;
+            border-color: #007bb8;
+            box-shadow: 0 0 0 2px rgba(0, 149, 209, 0.25);
+        }
+
+        &:hover {
+            border-color: #007bb8;
+        }
+
+        &:disabled {
+            color: #bbb;
+            border-color: #ddd;
+            background-color: #f5f5f5;
+            cursor: not-allowed;
         }
     }
 
@@ -94,7 +147,8 @@
         display: flex;
         gap: 10px;
 
-        button {
+        // 점퍼 버튼 스타일 - 더 구체적인 선택자 사용
+        .alpine-calendar-component__jump-btn {
             background-color: transparent;
             border: 1px solid #0095d1;
             border-radius: 3px;
@@ -102,6 +156,52 @@
             cursor: pointer;
             padding: 2px 5px;
             margin: 0;
+
+            &:disabled {
+                color: #bbb;
+                border-color: #ddd;
+                background-color: #f5f5f5;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    // 컴포넌트 최상위 버튼 스타일 - 변경 버튼 등
+    >button,
+    .alpine-calendar-component__action-btn {
+        background-color: transparent;
+        border: 1px solid #0095d1;
+        border-radius: 3px;
+        color: #0095d1;
+        cursor: pointer;
+        padding: 5px 10px;
+        margin: 5px 0;
+
+        &:disabled {
+            color: #bbb;
+            border-color: #ddd;
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+    }
+
+    // 아이콘 버튼 스타일 - 배경과 테두리 없음
+    &__icon-btn {
+        background-color: transparent;
+        border: none;
+        color: #0095d1;
+        cursor: pointer;
+        padding: 5px;
+        margin: 0;
+        font-size: 16px;
+
+        &:hover {
+            color: #007bb8;
+        }
+
+        &:disabled {
+            color: #bbb;
+            cursor: not-allowed;
         }
     }
 }

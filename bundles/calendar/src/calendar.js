@@ -197,6 +197,32 @@ const CalendarEntryController = (initialYear, initialMonth) => {
         monthNames: monthNames,
         grids: grids,
 
+        // 모든 월 이름 반환 (드롭다운용)
+        getAllMonths() {
+            return CALENDAR_MONTHS;
+        },
+
+        // 연도 범위 생성 (드롭다운용)
+        getYearRange() {
+            const currentYear = new Date().getFullYear();
+            const startYear = currentYear - 10; // 현재 연도로부터 10년 전
+            const endYear = currentYear + 10; // 현재 연도로부터 10년 후
+            const years = [];
+            
+            for (let year = startYear; year <= endYear; year++) {
+                years.push(year);
+            }
+            
+            return years;
+        },
+
+        // 특정 연도와 월로 이동 (드롭다운에서 사용)
+        gotoMonthYear(year, month, calendarIndex = 0) {
+            // 선택된 달력 인덱스를 기준으로 기준 월 계산
+            const baseMonth = month - calendarIndex;
+            this.gotoDate(new Date(year, baseMonth, 1));
+        },
+
         gotoDate(target) {
             this.year = target.getFullYear();
             this.month = target.getMonth();
@@ -239,6 +265,7 @@ const CalendarModuleController = (config = {}) => {
         selectedDate: null,
         selectedDates: [],
         availables: config.availableDates || [],
+        showControl: config.showControl || false,
 
         async init() {
             this.$watch("selectMode", () => { this.clearSelection(); });
@@ -368,6 +395,16 @@ const CalendarModuleController = (config = {}) => {
                     if (this.selectedEntry) {
                         this.selectedDate = getYmdFromEntry(this.selectedEntry);
                     }
+
+                    // Dispatch custom event for selected date
+                    if (this.selectedDate) {
+                        const myCalendarElement = this.$el.closest('my-calendar');
+                        if (myCalendarElement) {
+                            myCalendarElement.dispatchEvent(new CustomEvent('date-selected', {
+                                detail: { date: this.selectedDate }
+                            }));
+                        }
+                    }
                     break;
                 case "multiple":
                     if (entry == null) {
@@ -416,6 +453,17 @@ const CalendarModuleController = (config = {}) => {
                                 return false;
                             }
                         }
+
+                        // Dispatch custom event for selected date range
+                        const myCalendarElement = this.$el.closest('my-calendar');
+                        if (myCalendarElement) {
+                            myCalendarElement.dispatchEvent(new CustomEvent('dates-selected', {
+                                detail: {
+                                    startDate: this.selectedDates[0],
+                                    endDate: this.selectedDates[1]
+                                }
+                            }));
+                        }
                     }
                     break;
             }
@@ -458,6 +506,214 @@ export function registerCalendar(config = {}) {
     };
 
     return result;
+}
+
+// Web Component 클래스 부분 수정
+class CalendarElement extends HTMLElement {
+    constructor() {
+        super();
+        this._config = {
+            showCalendarCount: 1,
+            selectMode: 'single',
+            availableDates: []
+        };
+
+        // // 디버깅을 위한 로그 추가
+        // console.log('Calendar element created');
+    }
+
+    // 관찰할 속성들 정의
+    static get observedAttributes() {
+        return ['show-calendar-count', 'select-mode', 'available-dates', 'config'];
+    }
+
+    // 속성이 변경되면 호출됨
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue === newValue) return;
+        // console.log(`Calendar attribute changed: ${name} = ${newValue}`);
+
+        switch (name) {
+            case 'show-calendar-count':
+                this._config.showCalendarCount = parseInt(newValue, 10) || 1;
+                break;
+            case 'select-mode':
+                this._config.selectMode = newValue || 'single';
+                break;
+            case 'available-dates':
+                try {
+                    this._config.availableDates = JSON.parse(newValue) || [];
+                } catch (e) {
+                    console.error('Invalid available-dates attribute:', e);
+                    this._config.availableDates = [];
+                }
+                break;
+            case 'config':
+                try {
+                    const configObj = JSON.parse(newValue);
+                    this._config = { ...this._config, ...configObj };
+                    // console.log('Config updated:', this._config);
+                } catch (e) {
+                    console.error('Invalid config attribute:', e);
+                }
+                break;
+        }
+
+        // 이미 DOM에 연결된 상태라면 업데이트
+        if (this.isConnected) {
+            this._updateCalendar();
+        }
+    }
+
+    // 요소가 DOM에 연결될 때 호출됨
+    connectedCallback() {
+        // console.log('Calendar element connected to DOM');
+
+        // HTML 속성에서 설정 가져오기
+        const countAttr = this.getAttribute('show-calendar-count');
+        const modeAttr = this.getAttribute('select-mode');
+        const datesAttr = this.getAttribute('available-dates');
+        const configAttr = this.getAttribute('config');
+
+        // 개별 속성 처리
+        if (countAttr) {
+            this._config.showCalendarCount = parseInt(countAttr, 10) || 1;
+        }
+
+        if (modeAttr) {
+            this._config.selectMode = modeAttr;
+        }
+
+        if (datesAttr) {
+            try {
+                this._config.availableDates = JSON.parse(datesAttr) || [];
+            } catch (e) {
+                console.error('Invalid available-dates attribute:', e);
+            }
+        }
+
+        // config 객체로 한 번에 처리
+        if (configAttr) {
+            try {
+                const parsedConfig = JSON.parse(configAttr);
+                this._config = { ...this._config, ...parsedConfig };
+                // console.log('Initial config:', this._config);
+            } catch (e) {
+                console.error('Invalid config attribute:', e);
+            }
+        }
+
+        // Alpine.js 초기화 확인 후 마운트
+        this._waitForAlpineAndMount();
+    }
+
+    // Alpine.js 초기화 대기 후 마운트
+    _waitForAlpineAndMount() {
+        if (window.Alpine && window.Alpine.version) {
+            // console.log('Alpine.js detected, mounting calendar');
+            this._mountCalendar(); // Alpine이 이미 로드됨
+        } else {
+            console.log('Waiting for Alpine.js to initialize...');
+            // Alpine 로드 대기
+            window.addEventListener('alpine:initialized', () => {
+                console.log('Alpine:initialized event detected');
+                this._mountCalendar();
+            }, { once: true });
+
+            // 백업: 약간의 지연 후 다시 시도
+            setTimeout(() => {
+                if (!this._mounted && window.Alpine) {
+                    console.log('Mounting calendar after timeout');
+                    this._mountCalendar();
+                }
+            }, 500);
+        }
+    }
+
+    // 캘린더 마운트 메서드
+    _mountCalendar() {
+        if (this._mounted) return;
+
+        if (!window.Alpine) {
+            console.error('Alpine.js is not loaded. Please load Alpine.js first.');
+            return;
+        }
+
+        // console.log('Mounting calendar with config:', this._config);
+        this._mounted = true;
+
+        try {
+            const calendar = registerCalendar(this._config);
+            if (calendar) {
+                // console.log('Calendar registered successfully');
+                calendar.mount(this);
+
+                // Alpine 초기화 완료 후 이벤트 감시 설정
+                setTimeout(() => {
+                    this._setupDateSelectionListeners();
+                }, 150);
+            } else {
+                console.error('Failed to register calendar');
+            }
+        } catch (error) {
+            console.error('Error mounting calendar:', error);
+        }
+    }
+
+    // 달력 업데이트
+    _updateCalendar() {
+        if (!this._mounted || !window.Alpine) return;
+
+        // console.log('Updating calendar with new config');
+        this.innerHTML = '';
+        this._mounted = false;
+        this._mountCalendar();
+    }
+
+    // 날짜 선택 감시 설정
+    _setupDateSelectionListeners() {
+        try {
+            // console.log('Setting up date selection listeners');
+            const moduleElement = this.querySelector('[x-data="calendar_module"]');
+            if (moduleElement && moduleElement.__x) {
+                console.log('Found calendar module element');
+                const component = moduleElement.__x.$data;
+
+                // selectEntry 메서드 오버라이드하여 이벤트 발생
+                const originalSelectEntry = component.selectEntry;
+                component.selectEntry = (entry = null) => {
+                    originalSelectEntry.call(component, entry);
+
+                    // 단일 선택 모드
+                    if (component.selectMode === 'single' && component.selectedDate) {
+                        this.dispatchEvent(new CustomEvent('date-selected', {
+                            detail: { date: component.selectedDate }
+                        }));
+                    }
+
+                    // 다중 선택 모드
+                    if (component.selectMode === 'multiple' && component.selectedDates.length === 2) {
+                        this.dispatchEvent(new CustomEvent('dates-selected', {
+                            detail: {
+                                startDate: component.selectedDates[0],
+                                endDate: component.selectedDates[1]
+                            }
+                        }));
+                    }
+                };
+                console.log('Selection listeners setup complete');
+            // } else {
+            //     console.warn('Calendar module element not found or Alpine data not initialized');
+            }
+        } catch (e) {
+            console.warn('Error setting up date selection listeners:', e);
+        }
+    }
+}
+
+// 웹 컴포넌트 등록
+if (!customElements.get('my-calendar')) {
+    // console.log('Defining my-calendar custom element');
+    customElements.define('my-calendar', CalendarElement);
 }
 
 // 자동 마운트 - <div data-calendar-mount></div>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpine.js slider example</title>
+    <title>Alpine.js 슬라이더 컴포넌트</title>
 
     <link rel="stylesheet" href="./dist/slider-styles.css">
 
@@ -15,6 +15,7 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            color: #333;
         }
 
         h1,
@@ -25,102 +26,181 @@
 
         h1 {
             border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
         }
 
-        .slider-container {
-            margin: 30px 0;
-            padding: 0;
+        .section {
+            margin: 40px 0;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eee;
         }
 
-        .main-content {
-            margin: 30px 0;
-        }
-
-        pre {
-            background-color: #f5f5f5;
+        .code-example {
+            background-color: #f8f8f8;
+            border-left: 4px solid #4CAF50;
             padding: 15px;
-            border-radius: 5px;
+            margin: 20px 0;
             overflow-x: auto;
         }
 
-        code {
+        pre {
+            margin: 0;
             font-family: 'Consolas', monospace;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            background-color: #4CAF50;
+            color: white;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #388E3C;
         }
     </style>
 </head>
 
 <body>
-    <h1>Alpine.js 슬라이더 컴포넌트 예제</h1>
+    <h1>Alpine.js 슬라이더 컴포넌트</h1>
 
-    <div class="main-content">
-        <p>이 예제는 Alpine.js를 사용하여 이미지 슬라이더 컴포넌트를 구현하고 번들링한 결과입니다.</p>
-        <p>아래 예제는 슬라이더 컴포넌트를 사용하는 방법을 보여줍니다.</p>
-    </div>
+    <div class="section">
+        <h2>직접 배치된 커스텀 태그 업데이트</h2>
+        <p>슬라이더 태그를 직접 HTML에 배치하고 JavaScript로 업데이트합니다.</p>
 
-    <h2>이미지 슬라이더</h2>
-    <div class="slider-container" id="slider-custom"></div>
+        <!-- 직접 HTML에 배치된 슬라이더 태그 -->
+        <my-slider id="direct-slider"></my-slider>
+        <br>
+        <button id="init-slider">슬라이더 초기화</button>
+        <button id="update-slider">슬라이더 업데이트</button>
 
-    <div class="main-content">
-        <h2>사용 방법</h2>
+        <div class="code-example">
+            <pre><code>// HTML에 직접 배치한 태그
+&lt;my-slider id="direct-slider"&gt;&lt;/my-slider&gt;
 
-        <h3>필수 파일 로드</h3>
-        <pre>
-            <code>
-&lt;!-- 로드: Alpine.js -> 슬라이더 스타일 -> 슬라이더 스크립트 --&gt;
-&lt;script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"&gt;&lt;/script&gt;
-&lt;link rel="stylesheet" href="./dist/slider-styles.css"&gt;
-&lt;script src="./dist/slider-bundle.js"&gt;&lt;/script&gt;
-            </code>
-        </pre>
+// 초기 설정 적용
+document.getElementById('init-slider').addEventListener('click', function() {
+    const slider = document.getElementById('direct-slider');
+    
+    // 초기 설정
+    const initialConfig = {
+        transitionType: "slide",
+        autoplayEnabled: true,
+        interval: 5,
+        showIndicators: true,
+        images: [
+            { src: "./images/1.jpg", alt: "이미지 1", href: "#" },
+            { src: "./images/2.jpg", alt: "이미지 2", href: "#" }
+        ]
+    };
+    
+    // 기존 슬라이더 교체 (새로운 슬라이더로)
+    const newSlider = document.createElement('my-slider');
+    newSlider.id = "direct-slider";
+    newSlider.setAttribute('config', JSON.stringify(initialConfig));
+    
+    // 기존 슬라이더와 교체
+    slider.replaceWith(newSlider);
+});
 
-        <h3>마운트</h3>
-        <pre>
-            <code>
-// 사용자 지정 옵션으로 마운트
-const sliderConfig = {
-    transitionType: 'slide',  // 화면 전환: slide, fade
-    autoplayEnabled: true,    // 자동 화면 전환
-    interval: 3,              // 화면 전환 간격 (초)
-    transitionDuration: 0.6,  // 전환 대기 시간 (초)
-    imagePosition: 'center',  // 이미지 표시 기준 (top, center, bottom)
-    showIndicators: true,     // 현재 이미지 순서 표시
-    showControl: true,        // 제어기 표시
-    images: [
-        { src: "img1.jpg", alt: "내 이미지 1", href: "http://www.example.com" },
-        { src: "img2.jpg", alt: "내 이미지 2", href: "http://www.example.org" }
-    ]
-};
-const slider = SliderComponent.registerSlider(sliderConfig);
-if (slider) { slider.mount('#slider-custom'); }
-            </code>
-        </pre>
+// 슬라이더 업데이트
+document.getElementById('update-slider').addEventListener('click', function() {
+    const slider = document.getElementById('direct-slider');
+    
+    // 업데이트 설정
+    const updatedConfig = {
+        transitionType: "fade",
+        autoplayEnabled: true,
+        interval: 3,
+        showIndicators: true,
+        showControl: true,
+        images: [
+            { src: "./images/3.jpg", alt: "이미지 3", href: "#" },
+            { src: "./images/4.jpg", alt: "이미지 4", href: "#" },
+            { src: "./images/5.jpg", alt: "이미지 5", href: "#" }
+        ]
+    };
+    
+    // 기존 슬라이더 교체 (새로운 슬라이더로)
+    const newSlider = document.createElement('my-slider');
+    newSlider.id = "direct-slider";
+    newSlider.setAttribute('config', JSON.stringify(updatedConfig));
+    
+    // 기존 슬라이더와 교체
+    slider.replaceWith(newSlider);
+});</code></pre>
+        </div>
     </div>
 
     <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
     <script src="./dist/slider-bundle.js"></script>
 
     <script>
-        const sliderConfig = {
-            transitionType: 'fade',
-            autoplayEnabled: true,
-            interval: 3,
-            transitionDuration: 0.6,
-            imagePosition: 'center',
-            showIndicators: true,
-            // showControl: false,
-            images: [
-                { src: "./images/1.jpg", alt: "My image 1", href: "http://www.example.com" },
-                { src: "./images/2.jpg", alt: "My image 2", href: "http://www.example.org" },
-                { src: "./images/3.jpg", alt: "My image 3", href: "http://www.example.net" },
-                { src: "./images/4.jpg", alt: "My image 4", href: "http://www.example.net" },
-                { src: "./images/5.jpg", alt: "My image 5", href: "http://www.example.io" }
-            ]
-        };
+        function initSlider() {
+            console.log('Initializing slider...');
+
+            const slider = document.getElementById('direct-slider');
+
+            const initialConfig = {
+                transitionType: "slide",
+                autoplayEnabled: true,
+                interval: 5,
+                showIndicators: true,
+                images: [
+                    { src: "./images/1.jpg", alt: "이미지 1", href: "#" },
+                    { src: "./images/2.jpg", alt: "이미지 2", href: "#" }
+                ]
+            };
+
+            const newSlider = document.createElement('my-slider');
+            newSlider.id = "direct-slider";
+            newSlider.setAttribute('config', JSON.stringify(initialConfig));
+
+            slider.replaceWith(newSlider);
+            console.log('Slider initialized');
+        }
+
+        function updateSlider () {
+                console.log('Updating slider...');
+
+                const slider = document.getElementById('direct-slider');
+
+                const updatedConfig = {
+                    transitionType: "fade",
+                    autoplayEnabled: true,
+                    interval: 3,
+                    showIndicators: true,
+                    showControl: true,
+                    images: [
+                        { src: "./images/3.jpg", alt: "이미지 3", href: "#" },
+                        { src: "./images/4.jpg", alt: "이미지 4", href: "#" },
+                        { src: "./images/5.jpg", alt: "이미지 5", href: "#" }
+                    ]
+                };
+
+                const newSlider = document.createElement('my-slider');
+                newSlider.id = "direct-slider";
+                newSlider.setAttribute('config', JSON.stringify(updatedConfig));
+
+                slider.replaceWith(newSlider);
+                console.log('Slider updated');
+            }
 
         document.addEventListener('DOMContentLoaded', () => {
             if (SliderComponent) {
-                const slider = SliderComponent.registerSlider(sliderConfig);
-                if (slider) { slider.mount('#slider-custom'); }
+                SliderComponent.registerSlider();
+                console.log('Slider component registered');
+
+                document.getElementById('init-slider').addEventListener('click', initSlider);
+                document.getElementById('update-slider').addEventListener('click', updateSlider);
+
+                initSlider();
             }
         });
     </script>

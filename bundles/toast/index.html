@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpine.js Toast Notification 예제</title>
+    <title>Alpine.js Toast 커스텀 태그 예제</title>
 
     <!-- Remix Icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
@@ -55,6 +55,7 @@
 
         .button-group {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             margin-top: 20px;
         }
@@ -91,14 +92,48 @@
         .main-content {
             margin: 30px 0;
         }
+
+        pre {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .toast-examples {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .toast-example {
+            flex: 1;
+            min-width: 300px;
+            background-color: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .toast-example h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Alpine.js Toast Notification 컴포넌트 예제</h1>
+    <h1>Alpine.js Toast 커스텀 태그 예제</h1>
 
     <div class="main-content">
-        <p>이 예제는 Alpine.js를 사용하여 Toast Notification 컴포넌트를 구현하는 방법을 보여줍니다.</p>
+        <p>이 예제는 Alpine.js를 사용하여 Toast 알림 컴포넌트를 커스텀 HTML 태그로 사용하는 방법을 보여줍니다.</p>
         <p>아래 컨트롤 패널을 사용하여 다양한 종류의 토스트 메시지를 표시할 수 있습니다.</p>
     </div>
 
@@ -148,26 +183,60 @@
             <button class="warning-btn" onclick="showToast('warning')">경고 메시지</button>
             <button class="info-btn" onclick="showToast('info')">정보 메시지</button>
         </div>
+
+        <div class="button-group">
+            <button onclick="showPositionTest()">여러 위치 테스트</button>
+        </div>
     </div>
 
-    <!-- 토스트 컨테이너 마운트 -->
-    <div data-toast-mount></div>
+    <div class="toast-examples">
+        <div class="toast-example">
+            <h3>기본 사용법</h3>
+            <pre><code>&lt;my-toast id="toast-container"&gt;&lt;/my-toast&gt;</code></pre>
+            <button class="info-btn" onclick="showSimpleToast()">기본 토스트 표시</button>
+        </div>
+
+        <div class="toast-example">
+            <h3>옵션 설정</h3>
+            <pre><code>&lt;my-toast 
+  id="custom-toast" 
+  position="bottom-right" 
+  duration="5000"
+&gt;&lt;/my-toast&gt;</code></pre>
+            <button class="warning-btn" onclick="showCustomToast()">커스텀 토스트 표시</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h2>JavaScript 사용 방법</h2>
+        <pre><code>// 기본 사용
+toast.success('성공 메시지');
+toast.error('오류 메시지');
+toast.warning('경고 메시지');
+toast.info('정보 메시지');
+
+// 추가 옵션 사용
+toast.info('메시지 내용', {
+  title: '커스텀 제목',
+  duration: 5000,
+  position: 'top-right', // 위치 설정
+  closable: true,
+  showProgress: true
+});</code></pre>
+    </div>
+
+    <!-- 토스트 컨테이너 -->
+    <my-toast id="toast-container"></my-toast>
+    <my-toast id="custom-toast" position="bottom-right" duration="5000"></my-toast>
 
     <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
     <script src="./dist/toast-bundle.js"></script>
 
     <script>
-        // 토스트 설정
-        const toastConfig = {
-            position: 'top-right',
-            duration: 3000,
-            maxToasts: 5
-        };
-
         document.addEventListener('DOMContentLoaded', () => {
-            // 수동 마운트 예제 (여기서는 data-toast-mount 속성을 사용하여 자동 마운트)
             if (ToastComponent) {
-                ToastComponent.registerToast(toastConfig);
+                ToastComponent.registerToast();
+                console.log("Toast component registered");
             }
         });
 
@@ -180,25 +249,39 @@
             const showProgress = document.getElementById('toast-progress').checked;
 
             if (window.toast) {
-                // 선택한 토스트 위치 업데이트
-                const toastContainer = document.querySelector('.toast-container');
-                if (toastContainer) {
-                    // 기존 위치 클래스 제거
-                    toastContainer.classList.remove(
-                        'top-right', 'top-left', 'top-center',
-                        'bottom-right', 'bottom-left', 'bottom-center'
-                    );
-                    // 새 위치 클래스 추가
-                    toastContainer.classList.add(position);
-                }
+                window.toast[type](message, { title, duration, position, closable, showProgress });
+            }
+        }
 
-                // 토스트 표시
-                window.toast[type](message, {
-                    title,
-                    duration,
-                    closable,
-                    showProgress
-                });
+        function showSimpleToast() {
+            if (window.toast) {
+                window.toast.info('기본 설정의 토스트 메시지입니다.');
+            }
+        }
+
+        function showCustomToast() {
+            const customEvent = new CustomEvent('show-toast', {
+                detail: {
+                    title: '커스텀 토스트',
+                    message: '하단 오른쪽에 5초 동안 표시됩니다.',
+                    type: 'warning',
+                    duration: 5000,
+                    position: 'bottom-right'
+                }
+            });
+
+            document.getElementById('custom-toast').dispatchEvent(customEvent);
+        }
+
+        function showPositionTest() {
+            if (window.toast) {
+                // 다양한 위치에 토스트 표시
+                toast.info('오른쪽 상단 토스트', { position: 'top-right' });
+                setTimeout(() => toast.success('왼쪽 상단 토스트', { position: 'top-left' }), 300);
+                setTimeout(() => toast.warning('상단 중앙 토스트', { position: 'top-center' }), 600);
+                setTimeout(() => toast.error('오른쪽 하단 토스트', { position: 'bottom-right' }), 900);
+                setTimeout(() => toast.info('왼쪽 하단 토스트', { position: 'bottom-left' }), 1200);
+                setTimeout(() => toast.success('하단 중앙 토스트', { position: 'bottom-center' }), 1500);
             }
         }
     </script>

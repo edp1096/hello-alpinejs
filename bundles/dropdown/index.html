@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpine.js 드롭다운 예제</title>
+    <title>Alpine.js 드롭다운 커스텀 태그 예제</title>
 
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="./dist/dropdown-styles.css">
@@ -42,51 +42,345 @@
         .main-content {
             margin: 30px 0;
         }
+
+        pre {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* 선택 결과 표시를 위한 스타일 추가 */
+        .selection-result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .method-container {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        .method-title {
+            color: #4070f4;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .note {
+            background-color: #fffde7;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Alpine.js 드롭다운 컴포넌트 예제</h1>
+    <h1>Alpine.js 드롭다운 커스텀 태그 예제</h1>
 
     <div class="main-content">
-        <p>이 예제는 Alpine.js를 사용하여 드롭다운 컴포넌트를 구현하고 esbuild로 번들링하는 방법을 보여줍니다.</p>
-        <p>아래 드롭다운은 별도의 JS 파일로 번들링된 컴포넌트입니다.</p>
+        <p>이 예제는 Alpine.js를 사용하여 드롭다운 컴포넌트를 커스텀 HTML 태그로 사용하는 방법을 보여줍니다.</p>
     </div>
 
-    <h2>드롭다운 수동 마운트 (커스텀 옵션)</h2>
-    <div class="dropdown-container" id="dropdown-mount"></div>
+    <h2>기본 사용법</h2>
+    <div class="dropdown-container">
+        <my-dropdown id="direct-dropdown" selected="내 정보" on-select="handleOptionSelected">
+            <option value="profile" icon="ri-user-3-line" url="/profile">내 정보</option>
+            <option value="settings" icon="ri-settings-3-line" url="/settings">설정</option>
+            <option value="logout" icon="ri-logout-box-line" url="/logout" disabled="true">로그아웃</option>
+        </my-dropdown>
+    </div>
 
-    <h2>드롭다운 자동 마운트 (기본 옵션)</h2>
-    <div class="dropdown-container" data-dropdown-mount></div>
+    <h2>속성을 통한 옵션 설정</h2>
+    <div class="dropdown-container">
+        <div style="text-align: center;">
+            <my-dropdown id="custom-dropdown" options='[
+                    {"name": "프로필", "icon": "ri-user-3-line"},
+                    {"name": "설정", "icon": "ri-settings-3-line"},
+                    {"name": "로그아웃", "icon": "ri-logout-box-line", "disabled": true}
+                ]' selected='{"name": "설정", "icon": "ri-settings-3-line"}' on-select="handleOptionSelected"></my-dropdown>
+
+            <!-- 선택 결과를 표시할 영역 -->
+            <div id="selection-result" class="selection-result">
+                선택한 항목: <span id="selected-option"></span>
+            </div>
+        </div>
+    </div>
 
     <div class="main-content">
-        <p>위쪽은 JavaScript로 마운트하고 커스텀 옵션을 지정한 예제, 아래쪽은 data-dropdown-mount 속성으로 자동 마운트한 예제입니다.</p>
+        <h2>사용 방법</h2>
+
+        <div class="method-container">
+            <h3 class="method-title">1. &lt;option&gt; 태그를 사용한 방식</h3>
+            <p>HTML의 &lt;select&gt; 태그처럼 내부에 &lt;option&gt; 태그를 사용하여 옵션을 정의할 수 있습니다. 이 방식은 가장 직관적이고 HTML 표준에 가까운 방식입니다.</p>
+
+            <pre><code>&lt;my-dropdown id="direct-dropdown" selected="내 정보" on-select="handleOptionSelected"&gt;
+    &lt;option value="profile" icon="ri-user-3-line" url="/profile"&gt;내 정보&lt;/option&gt;
+    &lt;option value="settings" icon="ri-settings-3-line" url="/settings"&gt;설정&lt;/option&gt;
+    &lt;option value="logout" icon="ri-logout-box-line" url="/logout" disabled="true"&gt;로그아웃&lt;/option&gt;
+&lt;/my-dropdown&gt;</code></pre>
+
+            <p><strong>속성 설명:</strong></p>
+            <ul>
+                <li><code>value</code>: 옵션의 값 (선택 시 이벤트에서 사용)</li>
+                <li><code>icon</code>: 아이콘 클래스 (RemixIcon 클래스명)</li>
+                <li><code>url</code>: 링크 URL (사용자 정의 속성)</li>
+                <li><code>disabled</code>: 비활성화 여부 (값이 "true"면 선택 불가)</li>
+                <li>기타 추가 속성: 원하는 추가 데이터를 자유롭게 속성으로 지정 가능</li>
+            </ul>
+
+            <div class="note">
+                <strong>참고:</strong> option 태그에 어떤 추가 속성이든 지정할 수 있으며, 모든 속성은 선택 시 이벤트 객체에 포함됩니다.
+            </div>
+        </div>
+
+        <div class="method-container">
+            <h3 class="method-title">2. JSON 속성을 통한 옵션 설정</h3>
+            <p>options 속성에 JSON 형식으로 옵션 목록을 지정할 수 있습니다. 이 방식은 JavaScript에서 동적으로 옵션을 생성할 때 유용합니다.</p>
+
+            <pre><code>&lt;my-dropdown 
+    id="custom-dropdown"
+    options='[
+        {"name": "프로필", "icon": "ri-user-3-line"},
+        {"name": "설정", "icon": "ri-settings-3-line"},
+        {"name": "로그아웃", "icon": "ri-logout-box-line", "disabled": true}
+    ]'
+    selected='{"name": "설정", "icon": "ri-settings-3-line"}'
+    on-select="handleOptionSelected"
+&gt;&lt;/my-dropdown&gt;</code></pre>
+
+            <p><strong>옵션 객체 속성:</strong></p>
+            <ul>
+                <li><code>name</code>: 표시되는 텍스트 (필수)</li>
+                <li><code>icon</code>: 아이콘 클래스 (RemixIcon 클래스명)</li>
+                <li><code>value</code>: 옵션의 값 (선택 시 사용, 없으면 name이 value로 사용됨)</li>
+                <li><code>disabled</code>: true로 설정하면 옵션을 선택할 수 없음</li>
+                <li>기타 사용자 정의 속성 (url, id 등): 필요한 데이터를 자유롭게 추가 가능</li>
+            </ul>
+        </div>
+
+        <div class="method-container">
+            <h3 class="method-title">3. 이벤트 처리</h3>
+            <p>옵션 선택 시 처리하는 방법은 두 가지가 있습니다:</p>
+
+            <h4>1) on-select 속성 사용</h4>
+            <pre><code>&lt;my-dropdown id="dropdown" on-select="handleOptionSelected"&gt;...&lt;/my-dropdown&gt;
+
+&lt;script&gt;
+    // 전역 스코프에 함수 정의
+    window.handleOptionSelected = function(option) {
+        console.log('선택된 옵션:', option);
+        
+        // disabled 속성 확인
+        if (option.disabled) {
+            console.log('비활성화된 옵션입니다.');
+            return;
+        }
+        
+        // URL로 이동 예시
+        if (option.url) {
+            // window.location.href = option.url;
+        }
+    };
+&lt;/script&gt;</code></pre>
+
+            <h4>2) 이벤트 리스너 사용</h4>
+            <pre><code>// 옵션 선택 이벤트 리스너
+document.getElementById('dropdown').addEventListener('option-selected', (event) => {
+    const option = event.detail.option;
+    console.log('선택된 옵션:', option);
+    
+    // disabled 속성 확인 (UI에서 이미 차단되지만 추가 검사)
+    if (option.disabled) {
+        console.log('비활성화된 옵션입니다.');
+        return;
+    }
+});</code></pre>
+        </div>
+
+        <div class="method-container">
+            <h3 class="method-title">4. 동적 옵션 관리 (JavaScript 메서드)</h3>
+            <p>JavaScript를 통해 드롭다운 옵션을 동적으로 추가, 제거, 수정할 수 있습니다.</p>
+
+            <table>
+                <tr>
+                    <th width="25%">메서드</th>
+                    <th width="30%">매개변수</th>
+                    <th width="45%">설명</th>
+                </tr>
+                <tr>
+                    <td><code>addOption(option)</code></td>
+                    <td>option: 추가할 옵션 객체</td>
+                    <td>드롭다운에 새로운 옵션을 추가합니다.</td>
+                </tr>
+                <tr>
+                    <td><code>removeOption(identifier)</code></td>
+                    <td>identifier: 제거할 옵션의 value, name 또는 인덱스</td>
+                    <td>지정된 옵션을 드롭다운에서 제거합니다.</td>
+                </tr>
+                <tr>
+                    <td><code>updateOption(identifier, newProps)</code></td>
+                    <td>identifier: 수정할 옵션의 value, name 또는 인덱스<br>newProps: 변경할 속성들</td>
+                    <td>특정 옵션의 속성을 업데이트합니다.</td>
+                </tr>
+                <tr>
+                    <td><code>updateOptions(newOptions)</code></td>
+                    <td>newOptions: 새로운 옵션 배열</td>
+                    <td>드롭다운의 모든 옵션을 새로운 배열로 교체합니다.</td>
+                </tr>
+                <tr>
+                    <td><code>getOptions()</code></td>
+                    <td>없음</td>
+                    <td>현재 드롭다운의 모든 옵션 배열을 반환합니다.</td>
+                </tr>
+                <tr>
+                    <td><code>setSelectedOption(option)</code></td>
+                    <td>option: 선택할 옵션 객체 또는 value/name</td>
+                    <td>현재 선택된 옵션을 변경합니다.</td>
+                </tr>
+            </table>
+
+            <h4>옵션 추가 예제</h4>
+            <pre><code>// 새 옵션 추가
+document.getElementById('direct-dropdown').addOption({
+    name: '새 메뉴',
+    value: 'new-menu',
+    icon: 'ri-add-line',
+    url: '/new'
+});
+
+// 비활성화된 옵션 추가
+document.getElementById('direct-dropdown').addOption({
+    name: '준비 중',
+    value: 'coming-soon',
+    icon: 'ri-time-line',
+    disabled: true
+});</code></pre>
+
+            <h4>옵션 제거 예제</h4>
+            <pre><code>// value로 옵션 제거
+document.getElementById('direct-dropdown').removeOption('profile');
+
+// 인덱스로 옵션 제거
+document.getElementById('direct-dropdown').removeOption(1); // 두 번째 항목 제거
+
+// 이름으로 옵션 제거
+document.getElementById('direct-dropdown').removeOption('설정');</code></pre>
+
+            <h4>옵션 수정 예제</h4>
+            <pre><code>// 옵션 이름과 아이콘 변경
+document.getElementById('direct-dropdown').updateOption('profile', {
+    name: '내 계정',
+    icon: 'ri-user-line'
+});
+
+// 옵션 비활성화
+document.getElementById('direct-dropdown').updateOption('logout', {
+    disabled: true
+});
+
+// 옵션 활성화
+document.getElementById('direct-dropdown').updateOption(0, {
+    disabled: false
+});</code></pre>
+
+            <h4>모든 옵션 한번에 변경</h4>
+            <pre><code>// 전체 옵션 업데이트 (비활성화 옵션 포함)
+document.getElementById('direct-dropdown').updateOptions([
+    { name: '홈', icon: 'ri-home-line', value: 'home', url: '/' },
+    { name: '설정', icon: 'ri-settings-line', value: 'settings', url: '/settings' },
+    { name: '메시지', icon: 'ri-message-line', value: 'message', url: '/message', disabled: true }
+]);</code></pre>
+
+            <h4>현재 옵션 조회</h4>
+            <pre><code>// 현재 옵션 목록 가져오기
+const currentOptions = document.getElementById('direct-dropdown').getOptions();
+console.log('현재 옵션 목록:', currentOptions);</code></pre>
+
+            <h4>선택된 옵션 변경</h4>
+            <pre><code>// value로 선택 변경
+document.getElementById('direct-dropdown').setSelectedOption('settings');
+
+// 이름으로 선택 변경
+document.getElementById('direct-dropdown').setSelectedOption('로그아웃');</code></pre>
+
+            <div class="note">
+                <strong>참고:</strong> 동적 옵션 관리 메서드 호출 시 드롭다운은 내부적으로 재생성됩니다. 이 과정에서 이벤트 핸들러는 유지되지만, DOM 요소는 새로 생성되므로 DOM 참조를 캐시하고 있다면 업데이트해야 합니다.
+            </div>
+        </div>
+
+        <div class="method-container">
+            <h3 class="method-title">5. 기타 기능</h3>
+
+            <h4>비활성화된 옵션 스타일링</h4>
+            <p>비활성화된 옵션(<code>disabled: true</code>)은 자동으로 스타일이 적용되어 선택할 수 없습니다. 기본적으로 옵션은 반투명하게 표시되며 클릭이 불가능합니다.</p>
+
+            <h4>외부 클릭 시 드롭다운 닫기</h4>
+            <p>드롭다운은 외부 영역을 클릭하면 자동으로 닫히도록 구현되어 있습니다. 이 기능은 Alpine.js의 <code>@click.outside</code> 디렉티브를 사용합니다.</p>
+
+            <h4>커스텀 스타일링</h4>
+            <p>CSS 변수를 사용하여 드롭다운 스타일을 쉽게 커스터마이징할 수 있습니다:</p>
+            <pre><code>:root {
+    --first-color: hsl(225, 72%, 55%);     /* 아이콘 및 하이라이트 색상 */
+    --container-color: hsl(225, 75%, 97%); /* 배경 색상 */
+}</code></pre>
+        </div>
     </div>
 
     <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
     <script src="./dist/dropdown-bundle.js"></script>
 
     <script>
-        const dropdownConfig = {
-            options: [
-                { name: '내 프로필', icon: 'ri-user-3-line' },
-                { name: '메시지', icon: 'ri-message-3-line' },
-                { name: '계정', icon: 'ri-lock-line' },
-                { name: '설정', icon: 'ri-settings-3-line' },
-                { name: '로그아웃', icon: 'ri-logout-box-line' }
-            ],
-            defaultOption: { name: '내 프로필', icon: 'ri-user-3-line' },
-            onSelect: (option) => {
-                console.log('선택된 옵션:', option);
-            }
-        };
+        function handleOptionSelected(option) {
+            console.log('선택된 옵션:', option);
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (DropdownComponent) {
-                const dropdown = DropdownComponent.registerDropdown(dropdownConfig);
-                if (dropdown) { dropdown.mount('#dropdown-mount'); }
+            // 비활성화 옵션 확인
+            if (option.disabled) {
+                console.log('비활성화된 옵션입니다.');
+                return;
             }
-        });
+
+            // 선택 결과 표시
+            const resultElement = document.getElementById('selection-result');
+            const selectedTextElement = document.getElementById('selected-option');
+
+            if (resultElement && selectedTextElement) {
+                selectedTextElement.textContent = option.name;
+                resultElement.style.display = 'block';
+            }
+        }
     </script>
 </body>
 

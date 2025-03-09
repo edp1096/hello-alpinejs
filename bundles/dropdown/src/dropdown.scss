@@ -89,4 +89,15 @@
         transform: scale(1);
         pointer-events: initial;
     }
+
+    // src/dropdown.scss에 추가
+    .dropdown__item--disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none; // 클릭 이벤트 차단
+
+        &:hover {
+            color: inherit; // 호버 색상 변경 방지
+        }
+    }
 }
