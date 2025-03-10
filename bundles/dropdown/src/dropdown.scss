@@ -20,7 +20,8 @@
     .dropdown__button {
         border: none;
         outline: none;
-        background-color: var(--container-color, #f8fafc);
+        background-color: var(--container-color, #f8fafc) !important;
+        color: var(--text-color, #333) !important;
         padding: 1.25rem;
         border-radius: 0.75rem;
         cursor: pointer;

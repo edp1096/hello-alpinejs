@@ -28,8 +28,8 @@ region-selector {
         width: 100%;
         padding: 10px 16px;
         background-color: #fff !important; // !important로 외부 스타일 덮어쓰기
-        border: 1px solid $rs-border-color;
-        border-radius: 6px;
+        border: 1px solid $rs-border-color !important;
+        border-radius: 6px !important;
         font-size: 14px;
         color: $rs-text-color;
         cursor: pointer;

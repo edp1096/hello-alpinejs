@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        .error-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #e53935;
+            margin-bottom: 20px;
+        }
+
+        .error-code {
+            font-size: 60px;
+            color: #e53935;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .error-message {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .home-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .home-button:hover {
+            background-color: #45a049;
+        }
+
+        .error-details {
+            margin-top: 30px;
+            text-align: left;
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow: auto;
+            max-height: 200px;
+            display: none;
+        }
+
+        .show-details-btn {
+            margin-top: 20px;
+            background: none;
+            border: none;
+            color: #2196F3;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="error-container">
+        <h1>
+            <%= title %>
+        </h1>
+
+        <div class="error-code">
+            <%= error.status || 500 %>
+        </div>
+
+        <div class="error-message">
+            <%= message %>
+        </div>
+
+        <a href="/" class="home-button">홈으로 돌아가기</a>
+
+        <% if (error && (error.status !==404)) { %>
+            <button class="show-details-btn" onclick="toggleDetails()">상세 정보 표시</button>
+
+            <div id="error-details" class="error-details">
+                <% if (error.stack) { %>
+                    <%= error.stack %>
+                        <% } else { %>
+                            <%= JSON.stringify(error, null, 2) %>
+                                <% } %>
+            </div>
+            <% } %>
+    </div>
+
+    <script>
+        function toggleDetails() {
+            const details = document.getElementById('error-details');
+            const button = document.querySelector('.show-details-btn');
+
+            if (details.style.display === 'block') {
+                details.style.display = 'none';
+                button.textContent = '상세 정보 표시';
+            } else {
+                details.style.display = 'block';
+                button.textContent = '상세 정보 숨기기';
+            }
+        }
+    </script>
+</body>
+
+</html>

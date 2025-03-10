@@ -478,31 +478,21 @@ function createExampleHtml(outputDir, components) {
           }
         }
         
-        // 컴포넌트 초기화
+        // 원본과 동일한 초기화 방식
         if (window.RegionSelectorComponent) {
+          // 컴포넌트 초기화 - 바로 데이터 전달
           const controller = RegionSelectorComponent.registerRegionSelector({
             cities: cities,
             districts: districts
           });
           
-          // 선택기 콜백 설정
-          const regionSelector = document.getElementById('demo-region-selector');
-          if (regionSelector) {
-            regionSelector.onRegionSelected = function(data) {
+          // 각 선택기에 대한 콜백
+          document.querySelectorAll('region-selector').forEach(el => {
+            el.onRegionSelected = function(data) {
               updateResultElement(data);
-              console.log('Region selected:', data);
+              console.log('onRegionSelected callback:', data);
             };
-            
-            // 이벤트 리스너 추가
-            regionSelector.addEventListener('region-selected', (e) => {
-              console.log('Region selected event:', e.detail);
-            });
-            
-            // DOM 준비 이벤트
-            regionSelector.addEventListener('region-selector-ready', () => {
-              console.log('Region selector is ready');
-            });
-          }
+          });
         }
       });
     </script>
