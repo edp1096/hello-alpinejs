@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine.js 컴포넌트 번들러</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>Alpine.js 컴포넌트 번들러</h1>
+            <p>필요한 Alpine.js 컴포넌트를 선택하여 커스텀 번들을 생성하세요.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="alert-container"></div>
+
+        <div class="search-section">
+            <input type="text" id="search-components" placeholder="컴포넌트 검색..." class="search-input">
+            <div class="selection-controls">
+                <button id="select-all" class="btn btn-secondary">전체 선택</button>
+                <button id="deselect-all" class="btn btn-secondary">전체 해제</button>
+                <span class="selection-count">선택됨: <span id="selected-count">0</span></span>
+            </div>
+        </div>
+
+        <form id="bundle-form">
+            <div class="components-container" id="components-list">
+                <!-- 컴포넌트 목록은 JavaScript로 로드됩니다 -->
+                <div class="loading-spinner" id="components-spinner">
+                    <div class="spinner"></div>
+                    <p>컴포넌트 목록 로드 중...</p>
+                </div>
+            </div>
+
+            <div class="bundle-options">
+                <h2>번들 옵션</h2>
+                <div class="option">
+                    <input type="checkbox" id="option-minify" checked>
+                    <label for="option-minify">코드 최소화 (Minify)</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="option-sourcemap">
+                    <label for="option-sourcemap">소스맵 포함</label>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit" id="create-bundle-btn" class="btn btn-primary" disabled>번들 생성</button>
+            </div>
+
+            <div class="bundle-process">
+                <!-- 번들 생성 중 스피너 -->
+                <div class="loading-spinner" id="bundle-spinner" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>번들 생성 중...</p>
+                </div>
+
+                <!-- 번들 생성 결과 -->
+                <div class="bundle-result" id="bundle-result" style="display: none;">
+                    <h3>번들 생성 완료</h3>
+                    <p id="bundle-result-message">번들이 성공적으로 생성되었습니다.</p>
+                    <a href="#" id="download-bundle-btn" class="btn btn-success" download>번들 다운로드</a>
+                </div>
+            </div>
+        </form>
+
+        <div class="debug-section">
+            <button id="debug-toggle" class="btn btn-secondary">디버그 정보 표시</button>
+            <div id="debug-info" style="display: none;">
+                <h3>디버그 정보</h3>
+                <pre id="debug-output"></pre>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Alpine.js 컴포넌트 번들러 &copy; 2023</p>
+        </div>
+    </footer>
+
+    <!-- 컴포넌트 목록 템플릿 -->
+    <template id="component-card-template">
+        <div class="component-card" data-tags="">
+            <div class="card-header">
+                <input type="checkbox" class="component-checkbox" value="">
+                <h3 class="card-title"></h3>
+            </div>
+            <div class="card-body">
+                <p class="card-description"></p>
+                <div class="card-tags"></div>
+                <div class="card-meta">
+                    <span class="version"></span>
+                    <span class="category"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 컴포넌트 태그 템플릿 -->
+    <template id="component-tag-template">
+        <span class="tag"></span>
+    </template>
+
+    <!-- 자바스크립트 -->
+    <script src="/js/bundler.js"></script>
+
+    <!-- 컴포넌트 목록 로드 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                // 컴포넌트 목록 로드
+                const response = await fetch('/components/list');
+
+                if (!response.ok) {
+                    throw new Error('컴포넌트 목록을 불러오는데 실패했습니다.');
+                }
+
+                const data = await response.json();
+
+                // 컴포넌트 목록 표시
+                const componentsList = document.getElementById('components-list');
+                const componentsSpinner = document.getElementById('components-spinner');
+
+                // 스피너 숨기기
+                if (componentsSpinner) {
+                    componentsSpinner.style.display = 'none';
+                }
+
+                if (data.components && Array.isArray(data.components)) {
+                    // 템플릿 요소
+                    const cardTemplate = document.getElementById('component-card-template');
+                    const tagTemplate = document.getElementById('component-tag-template');
+
+                    // 디버그 출력
+                    const debugOutput = document.getElementById('debug-output');
+                    if (debugOutput) {
+                        debugOutput.textContent = JSON.stringify(data.components, null, 2);
+                    }
+
+                    // 컴포넌트 카드 생성
+                    data.components.forEach(component => {
+                        if (!component.available) return;
+
+                        // 템플릿 복제
+                        const card = document.importNode(cardTemplate.content, true);
+
+                        // 카드 데이터 설정
+                        card.querySelector('.component-card').dataset.tags = (component.tags || []).join(',');
+                        card.querySelector('.component-checkbox').value = component.id;
+                        card.querySelector('.card-title').textContent = component.name || component.id;
+                        card.querySelector('.card-description').textContent = component.description || '';
+                        card.querySelector('.version').textContent = `v${component.version || '1.0.0'}`;
+                        card.querySelector('.category').textContent = component.category || 'UI';
+
+                        // 태그 추가
+                        const tagsContainer = card.querySelector('.card-tags');
+                        if (component.tags && Array.isArray(component.tags)) {
+                            component.tags.forEach(tag => {
+                                const tagElem = document.importNode(tagTemplate.content, true);
+                                tagElem.querySelector('.tag').textContent = tag;
+                                tagsContainer.appendChild(tagElem);
+                            });
+                        }
+
+                        // 컴포넌트 목록에 추가
+                        componentsList.appendChild(card);
+                    });
+
+                    // 컴포넌트 로드 후 체크박스 이벤트 초기화
+                    if (typeof setupComponentCheckboxes === 'function') {
+                        setTimeout(setupComponentCheckboxes, 100);
+                    }
+                } else {
+                    throw new Error('유효한 컴포넌트 목록이 아닙니다.');
+                }
+            } catch (error) {
+                console.error('컴포넌트 목록 로드 오류:', error);
+
+                // 오류 메시지 표시
+                const componentsList = document.getElementById('components-list');
+                const componentsSpinner = document.getElementById('components-spinner');
+
+                if (componentsSpinner) {
+                    componentsSpinner.style.display = 'none';
+                }
+
+                if (componentsList) {
+                    componentsList.innerHTML = `
+            <div class="error-message">
+              <p>컴포넌트 목록을 불러오는데 실패했습니다.</p>
+              <p>오류: ${error.message}</p>
+              <button onclick="location.reload()" class="btn btn-secondary">새로고침</button>
+            </div>
+          `;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "bundler",
+  "version": "0.0.1",
+  "description": "bundler",
+  "main": "app.js",
+  "author": "edp1096",
+  "license": "ISC",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "ejs": "^3.1.10",
+    "esbuild": "^0.25.0",
+    "express": "^4.21.2"
+  }
+}
