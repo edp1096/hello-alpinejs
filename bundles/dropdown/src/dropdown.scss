@@ -1,13 +1,20 @@
 // src/dropdown.scss
+
+// Shadow DOM 내부에서 적용되므로 !important 제거 가능
+// 스타일이 완전히 격리됨
+
+// 변수 정의
+$dropdown-primary-color: var(--first-color, #4070f4);
+$dropdown-container-color: var(--container-color, #f8fafc);
+$dropdown-text-color: var(--text-color, #333);
+
 .alpine-dropdown-component {
     position: relative;
     width: max-content;
     z-index: 1;
-    /* 기본 z-index 설정 */
 
     &:hover {
         z-index: 100;
-        /* 호버 시 더 높은 z-index로 설정 */
     }
 
     .dropdown__button,
@@ -20,17 +27,23 @@
     .dropdown__button {
         border: none;
         outline: none;
-        background-color: var(--container-color, #f8fafc) !important;
-        color: var(--text-color, #333) !important;
+        background-color: $dropdown-container-color;
+        color: $dropdown-text-color;
         padding: 1.25rem;
         border-radius: 0.75rem;
         cursor: pointer;
     }
 
-    .dropdown__icon,
-    .dropdown__icons {
+    // 아이콘 스타일
+    .dropdown__icon {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
         font-size: 1.25rem;
-        color: var(--first-color, #4070f4);
+        color: $dropdown-primary-color;
+        width: 1.5rem; // 고정 너비
+        height: 1.5rem; // 고정 높이
+        text-align: center;
     }
 
     .dropdown__name {
@@ -56,7 +69,7 @@
     }
 
     .dropdown__menu {
-        background-color: var(--container-color, #f8fafc);
+        background-color: $dropdown-container-color;
         padding: 1rem 1.25rem;
         border-radius: 0.75rem;
         display: grid;
@@ -71,7 +84,6 @@
         transition: opacity 0.4s, transform 0.2s;
         opacity: 0;
         z-index: 1000;
-        /* 드롭다운 메뉴의 z-index를 높게 설정 */
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
@@ -80,7 +92,7 @@
         transition: color 0.3s;
 
         &:hover {
-            color: var(--first-color, #4070f4);
+            color: $dropdown-primary-color;
         }
     }
 
@@ -91,14 +103,14 @@
         pointer-events: initial;
     }
 
-    // src/dropdown.scss에 추가
+    // 비활성화된 아이템 스타일
     .dropdown__item--disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        pointer-events: none; // 클릭 이벤트 차단
+        pointer-events: none;
 
         &:hover {
-            color: inherit; // 호버 색상 변경 방지
+            color: inherit;
         }
     }
 }

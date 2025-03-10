@@ -1,6 +1,6 @@
 <!-- src/dropdown.html -->
 <div x-data="dropdown" class="alpine-dropdown-component">
-    <div @click.outside="isOpen = false">
+    <div @click.stop>
         <button class="dropdown__button" @click.stop="toggle">
             <i :class="displayIcon" class="dropdown__icon"></i>
             <span class="dropdown__name" x-text="displayName"></span>
@@ -11,7 +11,7 @@
             </div>
         </button>
 
-        <ul class="dropdown__menu" :class="{'show-dropdown': isOpen}">
+        <ul class="dropdown__menu" :class="{'show-dropdown': isOpen}" @click.outside="isOpen = false">
             <template x-for="(option, index) in options" :key="index">
                 <li class="dropdown__item" :class="{'dropdown__item--disabled': option.disabled}" @click="!option.disabled && selectOption(option)">
                     <i :class="option.icon" class="dropdown__icon"></i>

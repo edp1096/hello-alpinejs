@@ -5,16 +5,106 @@ import './dropdown.scss';
 // 기본 옵션 설정 - 빈 배열
 const DEFAULT_OPTIONS = [];
 
+// 아이콘 라이브러리 기본값
+const DEFAULT_ICON_LIBRARIES = [
+    'https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css'
+];
+
+// 전역 아이콘 관리자
+const IconManager = {
+    loadedLibraries: new Set(),
+    initialized: false,
+
+    init(libraries = DEFAULT_ICON_LIBRARIES) {
+        if (this.initialized) return;
+
+        // 페이지 로드 시 모든 아이콘 라이브러리를 헤드에 한 번만 추가
+        libraries.forEach(url => {
+            if (!document.querySelector(`link[href="${url}"]`)) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = url;
+                document.head.appendChild(link);
+                this.loadedLibraries.add(url);
+            }
+        });
+
+        this.initialized = true;
+    },
+
+    // Shadow DOM 내부에서도 아이콘 사용 가능하도록 링크 추가
+    attachToShadow(shadowRoot, libraries = DEFAULT_ICON_LIBRARIES) {
+        // 전역 초기화
+        this.init(libraries);
+
+        // Shadow DOM에 스타일시트 추가
+        libraries.forEach(url => {
+            const shadowLink = document.createElement('link');
+            shadowLink.rel = 'stylesheet';
+            shadowLink.href = url;
+            shadowRoot.appendChild(shadowLink);
+        });
+    }
+};
+
 export function registerDropdown(config = {}) {
     if (!window.Alpine) {
         console.error('Alpine.js is not loaded. Please load Alpine.js first.');
         return null;
     }
 
+    // 아이콘 라이브러리 설정
+    const iconLibraries = config.iconLibraries || DEFAULT_ICON_LIBRARIES;
+
+    // 전역 아이콘 초기화 (페이지당 한 번만 실행)
+    IconManager.init(iconLibraries);
+
     // 커스텀 dropdown 태그 정의
     if (typeof customElements != 'undefined' && !customElements.get('my-dropdown')) {
         class DropdownElement extends HTMLElement {
-            connectedCallback() {
+            constructor() {
+                super();
+
+                // Shadow DOM 생성
+                this.attachShadow({ mode: 'open' });
+
+                // 컴포넌트 스타일 로드
+                const style = document.createElement('style');
+
+                // Shadow DOM에 아이콘 라이브러리 추가 (공유 리소스 사용)
+                IconManager.attachToShadow(this.shadowRoot, iconLibraries);
+
+                // 내부 스타일 로드 및 초기화
+                fetch('./dist/dropdown-styles.css')
+                    .then(response => response.text())
+                    .then(css => {
+                        style.textContent = css;
+                        this.shadowRoot.appendChild(style);
+
+                        // 템플릿 추가
+                        const template = document.createElement('div');
+                        template.innerHTML = dropdownTemplate;
+                        this.shadowRoot.appendChild(template.firstChild);
+
+                        // Alpine 초기화
+                        if (window.Alpine) {
+                            setTimeout(() => {
+                                window.Alpine.initTree(this.shadowRoot);
+                            }, 0);
+                        }
+
+                        // 속성 초기화
+                        this.initializeAttributes();
+
+                        // 컴포넌트 준비 완료 이벤트
+                        this.dispatchEvent(new CustomEvent('dropdown-ready', {
+                            bubbles: true,
+                            composed: true
+                        }));
+                    });
+            }
+
+            initializeAttributes() {
                 // option 태그를 처리하여 옵션 목록 구성
                 let optionsFromChildren = [];
                 const selectedValue = this.getAttribute('selected');
@@ -54,9 +144,6 @@ export function registerDropdown(config = {}) {
                     // option 태그 삭제 (처리 완료했으므로)
                     optionElements.forEach(option => option.remove());
                 }
-
-                // 태그가 문서에 연결될 때 내용 설정
-                this.innerHTML = dropdownTemplate;
 
                 // 옵션 속성 처리
                 const optionsAttr = this.getAttribute('options');
@@ -130,10 +217,7 @@ export function registerDropdown(config = {}) {
                     localConfig.defaultOption = localConfig.options[0];
                 }
 
-                // Alpine 컴포넌트 초기화를 위해 데이터 속성 추가
-                this.setAttribute('x-data', 'dropdown');
-
-                // Alpine 데이터 객체에 localConfig 전달
+                // Alpine 스토어에 데이터 설정
                 if (this.id) {
                     window.Alpine.store('dropdownConfig_' + this.id, localConfig);
                 } else {
@@ -165,6 +249,8 @@ export function registerDropdown(config = {}) {
              */
             addOption(option) {
                 if (!option || !option.name) return false;
+
+                console.log('Adding option:', option);
 
                 // 현재 설정 가져오기
                 const storeKey = 'dropdownConfig_' + this.id;
@@ -481,13 +567,12 @@ export function registerDropdown(config = {}) {
     }
 
     window.Alpine.data('dropdown', () => {
-        // Alpine 컴포넌트의 기본 설정
         return {
             init() {
-                // 드롭다운 요소 찾기
-                const dropdownEl = this.$el.closest('my-dropdown');
-                if (dropdownEl && dropdownEl.id) {
-                    const storeConfig = window.Alpine.store('dropdownConfig_' + dropdownEl.id);
+                // Shadow DOM 환경에서 호스트 요소 접근
+                const host = this.$el.getRootNode().host;
+                if (host && host.id) {
+                    const storeConfig = window.Alpine.store('dropdownConfig_' + host.id);
                     if (storeConfig) {
                         // 설정 복사
                         this.options = storeConfig.options || [];
@@ -523,11 +608,15 @@ export function registerDropdown(config = {}) {
                     this.onSelect(option);
                 }
 
-                // 커스텀 이벤트 발생
-                this.$el.dispatchEvent(new CustomEvent('option-selected', {
-                    detail: { option },
-                    bubbles: true
-                }));
+                // 커스텀 이벤트 발생 - Shadow DOM 경계를 넘도록 설정
+                const host = this.$el.getRootNode().host;
+                if (host) {
+                    host.dispatchEvent(new CustomEvent('option-selected', {
+                        detail: { option },
+                        bubbles: true,
+                        composed: true // Shadow DOM 경계를 넘어 이벤트 전파
+                    }));
+                }
             }
         };
     });
@@ -537,7 +626,35 @@ export function registerDropdown(config = {}) {
             if (typeof el == 'string') { el = document.querySelector(el); }
 
             if (el) {
-                el.innerHTML = dropdownTemplate;
+                // Shadow DOM 적용으로 mount 메서드 수정
+                el.innerHTML = '';
+                const shadowRoot = el.attachShadow({ mode: 'open' });
+
+                // 스타일 요소 생성
+                const style = document.createElement('style');
+
+                // Shadow DOM에 아이콘 라이브러리 추가 (공유 리소스 사용)
+                IconManager.attachToShadow(shadowRoot, iconLibraries);
+
+                // CSS 가져오기
+                fetch('./dist/dropdown-styles.css')
+                    .then(response => response.text())
+                    .then(css => {
+                        style.textContent = css;
+                        shadowRoot.appendChild(style);
+
+                        // 템플릿 추가
+                        const template = document.createElement('div');
+                        template.innerHTML = dropdownTemplate;
+                        shadowRoot.appendChild(template.firstChild);
+
+                        // Alpine 초기화
+                        if (window.Alpine) {
+                            setTimeout(() => {
+                                window.Alpine.initTree(shadowRoot);
+                            }, 0);
+                        }
+                    });
             } else {
                 console.error('Cannot find target element.', el);
             }
@@ -572,4 +689,18 @@ if (typeof document != 'undefined') {
     });
 }
 
-window.DropdownComponent = { registerDropdown };
+// 라이브러리 커스터마이징을 위한 인터페이스
+window.DropdownComponent = {
+    registerDropdown,
+    // 추가 아이콘 라이브러리 등록 (런타임)
+    registerIconLibrary(url) {
+        if (!IconManager.loadedLibraries.has(url)) {
+            // 헤드에 추가
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = url;
+            document.head.appendChild(link);
+            IconManager.loadedLibraries.add(url);
+        }
+    }
+};

@@ -13,6 +13,42 @@ export function registerRegionSelector(config = {}) {
 
     // 커스텀 element 클래스 정의 - 전역 변수에 할당
     RegionSelectorElement = class extends HTMLElement {
+        constructor() {
+            super();
+
+            // Shadow DOM 생성
+            this.attachShadow({ mode: 'open' });
+
+            // 스타일 요소 생성
+            const style = document.createElement('style');
+
+            // 스타일 태그에 스타일 추가 (빌드 시스템에서 가져옴)
+            fetch('./dist/region-selector-styles.css')
+                .then(response => response.text())
+                .then(css => {
+                    style.textContent = css;
+                    this.shadowRoot.appendChild(style);
+
+                    // 템플릿 추가
+                    const template = document.createElement('div');
+                    template.innerHTML = regionSelectorTemplate;
+                    this.shadowRoot.appendChild(template.firstChild);
+
+                    // Alpine 초기화
+                    if (window.Alpine) {
+                        setTimeout(() => {
+                            window.Alpine.initTree(this.shadowRoot);
+                        }, 0);
+                    }
+
+                    // 컴포넌트 준비 완료 이벤트
+                    this.dispatchEvent(new CustomEvent('region-selector-ready', {
+                        bubbles: true,
+                        composed: true
+                    }));
+                });
+        }
+
         connectedCallback() {
             // 속성에서 설정 가져오기
             let localConfig = { ...config };
@@ -49,23 +85,10 @@ export function registerRegionSelector(config = {}) {
                 localConfig.placeholderText = placeholderText;
             }
 
-            // 템플릿 설정
-            this.innerHTML = regionSelectorTemplate;
-
-            // // 디버그 로그
-            // console.log(`Region selector initialized: ID=${localConfig.selectorId || 'none'}`);
-
-            // Alpine 데이터 객체에 localConfig 전달
+            // Alpine 스토어에 데이터 설정
             if (this.id) {
                 window.Alpine.store('regionSelectorConfig_' + this.id, localConfig);
             }
-
-            // 이벤트 리스너 설정
-            this.addEventListener('region-selected', (event) => {
-                if (typeof this.onRegionSelected == 'function') {
-                    this.onRegionSelected(event.detail);
-                }
-            });
         }
 
         disconnectedCallback() {
@@ -77,22 +100,34 @@ export function registerRegionSelector(config = {}) {
 
         // 선택된 지역을 가져오는 메서드 (외부에서 접근 가능)
         getSelectedRegion() {
-            const alpine = this.__x;
-            if (alpine) {
-                return {
-                    city: alpine.$data.selectedCity,
-                    district: alpine.$data.selectedDistrict
-                };
+            const regionSelector = this.shadowRoot.querySelector('[x-data="regionSelector"]');
+            if (regionSelector && window.Alpine) {
+                try {
+                    const data = window.Alpine.$data(regionSelector);
+                    return {
+                        city: data.selectedCity,
+                        district: data.selectedDistrict
+                    };
+                } catch (e) {
+                    console.error('Error getting selected region:', e);
+                }
             }
             return { city: null, district: null };
         }
 
         // 선택된 지역을 설정하는 메서드 (외부에서 접근 가능)
         setSelectedRegion(city, district) {
-            const alpine = this.__x;
-            if (alpine) {
-                alpine.$data.selectedCity = city;
-                alpine.$data.selectedDistrict = district;
+            const regionSelector = this.shadowRoot.querySelector('[x-data="regionSelector"]');
+            if (regionSelector && window.Alpine) {
+                try {
+                    const data = window.Alpine.$data(regionSelector);
+                    data.selectedCity = city;
+                    setTimeout(() => {
+                        data.selectedDistrict = district;
+                    }, 100);
+                } catch (e) {
+                    console.error('Error setting selected region:', e);
+                }
             }
         }
     };
@@ -101,7 +136,7 @@ export function registerRegionSelector(config = {}) {
     const registerCustomElement = () => {
         if (typeof customElements != 'undefined' && !customElements.get('region-selector')) {
             customElements.define('region-selector', RegionSelectorElement);
-            // console.log('region-selector custom element defined');
+            console.log('region-selector custom element defined');
             return true;
         }
         return false;
@@ -118,9 +153,10 @@ export function registerRegionSelector(config = {}) {
 
         // 지역 데이터는 config에서 가져옴
         get cities() {
-            // 요소의 ID를 확인하고 해당 설정 가져오기
-            if (this.$el && this.$el.closest('region-selector') && this.$el.closest('region-selector').id) {
-                const customConfig = window.Alpine.store('regionSelectorConfig_' + this.$el.closest('region-selector').id);
+            // Shadow DOM에서 호스트 요소 가져오기
+            const host = this.$el.getRootNode().host;
+            if (host && host.id) {
+                const customConfig = window.Alpine.store('regionSelectorConfig_' + host.id);
                 if (customConfig && customConfig.cities) {
                     return customConfig.cities;
                 }
@@ -130,9 +166,10 @@ export function registerRegionSelector(config = {}) {
         },
 
         get districts() {
-            // 요소의 ID를 확인하고 해당 설정 가져오기
-            if (this.$el && this.$el.closest('region-selector') && this.$el.closest('region-selector').id) {
-                const customConfig = window.Alpine.store('regionSelectorConfig_' + this.$el.closest('region-selector').id);
+            // Shadow DOM에서 호스트 요소 가져오기
+            const host = this.$el.getRootNode().host;
+            if (host && host.id) {
+                const customConfig = window.Alpine.store('regionSelectorConfig_' + host.id);
                 if (customConfig && customConfig.districts) {
                     return customConfig.districts;
                 }
@@ -143,14 +180,15 @@ export function registerRegionSelector(config = {}) {
 
         // 선택기 ID를 config에서 가져옴
         get selectorId() {
-            // 요소의 ID를 확인하고 해당 설정 가져오기
-            if (this.$el && this.$el.closest('region-selector') && this.$el.closest('region-selector').id) {
-                const customConfig = window.Alpine.store('regionSelectorConfig_' + this.$el.closest('region-selector').id);
+            // Shadow DOM에서 호스트 요소 가져오기
+            const host = this.$el.getRootNode().host;
+            if (host && host.id) {
+                const customConfig = window.Alpine.store('regionSelectorConfig_' + host.id);
                 if (customConfig && customConfig.selectorId) {
                     return customConfig.selectorId;
                 }
 
-                return this.$el.closest('region-selector').id; // selector-id 속성이 없으면 요소의 id를 반환
+                return host.id; // selector-id 속성이 없으면 요소의 id를 반환
             }
 
             return this.config.selectorId || '';
@@ -158,15 +196,14 @@ export function registerRegionSelector(config = {}) {
 
         // 플레이스홀더 텍스트 가져오기 (사용자 정의 가능)
         get placeholderText() {
-            // 요소의 ID를 확인하고 해당 설정 가져오기
-            if (this.$el && this.$el.closest('region-selector') && this.$el.closest('region-selector').id) {
-                const customConfig = window.Alpine.store('regionSelectorConfig_' + this.$el.closest('region-selector').id);
+            // Shadow DOM에서 호스트 요소 가져오기
+            const host = this.$el.getRootNode().host;
+            if (host && host.id) {
+                const customConfig = window.Alpine.store('regionSelectorConfig_' + host.id);
                 if (customConfig && customConfig.placeholderText) {
                     return customConfig.placeholderText;
                 }
             }
-
-            const customConfig = window.Alpine.store('regionSelectorConfig_' + this.$el.closest('region-selector').id);
 
             return this.defaultPlaceHolderText;
         },
@@ -201,16 +238,21 @@ export function registerRegionSelector(config = {}) {
             // 시/도만 선택하고 군/구는 선택하지 않은 상태로 초기화
             this.selectedDistrict = null;
 
-            // 이벤트 발생
-            const selectedEvent = new CustomEvent('region-selected', {
-                detail: {
-                    city: this.selectedCity,
-                    district: null,
-                    selectorId: this.selectorId
-                },
-                bubbles: true
-            });
-            this.$el.dispatchEvent(selectedEvent);
+            // Shadow DOM에서 호스트 요소 가져오기
+            const host = this.$el.getRootNode().host;
+            if (host) {
+                // 이벤트 발생
+                const selectedEvent = new CustomEvent('region-selected', {
+                    detail: {
+                        city: this.selectedCity,
+                        district: null,
+                        selectorId: this.selectorId
+                    },
+                    bubbles: true,
+                    composed: true // Shadow DOM 경계를 넘어 이벤트 전파
+                });
+                host.dispatchEvent(selectedEvent);
+            }
 
             // 콜백 함수가 있다면 호출
             if (typeof this.config.onSelect == 'function') {
@@ -227,16 +269,21 @@ export function registerRegionSelector(config = {}) {
             this.selectedDistrict = district;
             this.closeDropdown();
 
-            // 선택된 지역 정보를 이벤트로 발생시킴
-            const selectedEvent = new CustomEvent('region-selected', {
-                detail: {
-                    city: this.selectedCity,
-                    district: district,
-                    selectorId: this.selectorId
-                },
-                bubbles: true
-            });
-            this.$el.dispatchEvent(selectedEvent);
+            // Shadow DOM에서 호스트 요소 가져오기
+            const host = this.$el.getRootNode().host;
+            if (host) {
+                // 선택된 지역 정보를 이벤트로 발생시킴
+                const selectedEvent = new CustomEvent('region-selected', {
+                    detail: {
+                        city: this.selectedCity,
+                        district: district,
+                        selectorId: this.selectorId
+                    },
+                    bubbles: true,
+                    composed: true // Shadow DOM 경계를 넘어 이벤트 전파
+                });
+                host.dispatchEvent(selectedEvent);
+            }
 
             // 콜백 함수가 있다면 호출
             if (typeof this.config.onSelect == 'function') {
@@ -254,16 +301,21 @@ export function registerRegionSelector(config = {}) {
             this.selectedDistrict = null;
             this.closeDropdown();
 
-            // 전체 지역 선택 이벤트 발생
-            const selectedEvent = new CustomEvent('region-selected', {
-                detail: {
-                    city: null,
-                    district: null,
-                    selectorId: this.selectorId
-                },
-                bubbles: true
-            });
-            this.$el.dispatchEvent(selectedEvent);
+            // Shadow DOM에서 호스트 요소 가져오기
+            const host = this.$el.getRootNode().host;
+            if (host) {
+                // 전체 지역 선택 이벤트 발생
+                const selectedEvent = new CustomEvent('region-selected', {
+                    detail: {
+                        city: null,
+                        district: null,
+                        selectorId: this.selectorId
+                    },
+                    bubbles: true,
+                    composed: true // Shadow DOM 경계를 넘어 이벤트 전파
+                });
+                host.dispatchEvent(selectedEvent);
+            }
 
             // 콜백 함수가 있다면 호출
             if (typeof this.config.onSelect == 'function') {
@@ -285,11 +337,6 @@ export function registerRegionSelector(config = {}) {
                     this.selectedDistrict = this.config.selectedDistrict;
                 }
             }
-
-            // 컴포넌트 요소의 Alpine 인스턴스 설정
-            if (this.$el && this.$el.closest('region-selector')) {
-                this.$el.closest('region-selector').__x = this.$data;
-            }
         }
     }));
 
@@ -300,7 +347,32 @@ export function registerRegionSelector(config = {}) {
             }
 
             if (el) {
-                el.innerHTML = regionSelectorTemplate;
+                // Shadow DOM 적용으로 mount 메서드 수정
+                el.innerHTML = '';
+                const shadowRoot = el.attachShadow({ mode: 'open' });
+
+                // 스타일 요소 생성
+                const style = document.createElement('style');
+
+                // CSS 가져오기
+                fetch('./dist/region-selector-styles.css')
+                    .then(response => response.text())
+                    .then(css => {
+                        style.textContent = css;
+                        shadowRoot.appendChild(style);
+
+                        // 템플릿 추가
+                        const template = document.createElement('div');
+                        template.innerHTML = regionSelectorTemplate;
+                        shadowRoot.appendChild(template.firstChild);
+
+                        // Alpine 초기화
+                        if (window.Alpine) {
+                            setTimeout(() => {
+                                window.Alpine.initTree(shadowRoot);
+                            }, 0);
+                        }
+                    });
             } else {
                 console.error('Cannot find target element.', el);
             }

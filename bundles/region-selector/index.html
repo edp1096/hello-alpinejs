@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지역 선택기 커스텀 태그 예제</title>
 
-    <link rel="stylesheet" href="./dist/region-selector-styles.css">
-
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -153,7 +151,7 @@ element.setSelectedRegion(city, district);</code></pre>
         function getSelectedRegion() {
             // const selector = document.querySelector('#default-selector');
             const selector = lastSelector;
-            if (selector && typeof selector.getSelectedRegion == 'function') {
+            if (selector && typeof selector.getSelectedRegion === 'function') {
                 const region = selector.getSelectedRegion();
 
                 let msg = "전체 지역";
@@ -229,12 +227,12 @@ element.setSelectedRegion(city, district);</code></pre>
 
                 // 각 선택기에 대한 콜백
                 document.querySelectorAll('region-selector').forEach(el => {
-                    el.onRegionSelected = function (data) {
+                    // 이벤트 리스너 추가
+                    el.addEventListener('region-selected', (event) => {
                         const resultElement = document.querySelector(`.region-selection-result[data-result-for="${el.id}"]`);
-
-                        updateResultElement(resultElement, data);
-                        console.log('onRegionSelected callback:', data);
-                    };
+                        updateResultElement(resultElement, event.detail);
+                        console.log('region-selected 이벤트:', event.detail);
+                    });
 
                     lastSelector = el;
                 });
