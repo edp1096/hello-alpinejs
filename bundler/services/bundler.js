@@ -139,8 +139,10 @@ function createExampleHtml(outputDir, components) {
     .container { margin-bottom: 40px; padding: 15px; border: 1px solid #eee; border-radius: 8px; }
     h1 { margin-bottom: 2rem; }
     h2 { margin-top: 2rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
-    .container button { padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    .container button:hover { background: #45a049; }
+    /* .container button { padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; } */
+    /* .container button:hover { background: #45a049; } */
+    button { padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #45a049; }
     code { background-color: #f5f5f5; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
     
     /* 전역 링크 스타일 - 컴포넌트 내부 링크에는 적용되지 않도록 */
