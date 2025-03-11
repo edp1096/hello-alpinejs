@@ -55,6 +55,15 @@ body {
   min-height: 100vh;
 }
 
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--secondary);
+  border-radius: 4px;
+}
+
 /* 로딩 스피너 */
 .loading-overlay {
   position: fixed;
@@ -315,15 +324,6 @@ body {
   transition: transform var(--transition-speed) ease, width var(--transition-speed) ease;
   overflow-y: auto;
   /* scrollbar-width: thin; */
-}
-
-.main-sidebar::-webkit-scrollbar {
-  width: 4px;
-}
-
-.main-sidebar::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
 }
 
 .main-sidebar.sidebar-closed {
@@ -672,7 +672,7 @@ body.sidebar-collapse .content-wrapper.content-shifted {
 }
 
 
-@media (prefers-color-scheme: 1dark) {
+@media (prefers-color-scheme: dark) {
   :root {
     --primary: #539bf5;
     --primary-light: rgba(83, 155, 245, 0.2);
@@ -683,7 +683,8 @@ body.sidebar-collapse .content-wrapper.content-shifted {
     --warning: #d39e00;
     --danger: #d73a49;
 
-    --dark: #c9d1d9;
+    /* --dark: #c9d1d9; */
+    --dark: #d1d5da;
     --light: #0d1117;
 
     --gray-100: #0d1117;
@@ -707,7 +708,7 @@ body.sidebar-collapse .content-wrapper.content-shifted {
   }
 
   .sidebar-menu .nav-link {
-    color: var(--gray-700);
+    color: var(--gray-600);
   }
 
   .content-wrapper {
