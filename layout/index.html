@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Dashboard layout</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+
+<body>
+  <!-- Loading spinner -->
+  <div id="loading" class="loading-overlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="app" x-data="appData" x-init="init()" x-cloak>
+    <!-- Top Navigation -->
+    <header class="main-header" x-data="navData">
+      <div class="navbar">
+        <div class="navbar-left">
+          <!-- Sidebar toggle -->
+          <button @click="toggleSidebar()" class="navbar-toggle" aria-label="Toggle sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <!-- Collapse toggle -->
+          <button @click="toggleCollapse()" class="navbar-toggle" aria-label="Collapse sidebar">
+            <i class="fas" :class="isSidebarCollapsed ? 'fa-expand' : 'fa-compress'"></i>
+          </button>
+
+          <div class="navbar-title">
+            <span style="color: var(--primary); font-weight: 700;">Modern</span><span style="font-weight: 400;">Admin</span>
+          </div>
+        </div>
+
+        <div class="navbar-right">
+          <!-- Notifications button -->
+          <div class="nav-item dropdown">
+            <button @click="toggleDropdown('notifications')" class="nav-link" aria-label="Notifications">
+              <i class="fas fa-bell"></i>
+              <span class="badge" x-show="getUnreadCount('notifications') > 0" x-text="getUnreadCount('notifications')"></span>
+            </button>
+          </div>
+
+          <!-- User menu button -->
+          <div class="nav-item dropdown">
+            <button @click="toggleDropdown('profile')" class="nav-link" style="display: flex; align-items: center; gap: 8px;">
+              <img :src="user.avatar" alt="User avatar" class="user-avatar">
+              <span class="d-none d-md-inline" style="font-weight: 500;" x-text="user.name"></span>
+            </button>
+          </div>
+
+          <!-- Notifications dropdown -->
+          <div class="dropdown-menu dropdown-menu-lg" :class="{'show': activeDropdown === 'notifications'}">
+            <div class="dropdown-header">
+              <h3><span x-text="getUnreadCount('notifications')"></span> Notifications</h3>
+            </div>
+            <template x-for="(notification, index) in notifications" :key="index">
+              <a href="#" class="dropdown-item">
+                <i class="fas fa-bell mr-2" style="color: var(--primary); margin-right: 10px;"></i>
+                <div style="flex: 1">
+                  <div x-text="notification.message"></div>
+                  <div style="font-size: 0.75rem; color: var(--gray-500);" x-text="notification.time"></div>
+                </div>
+              </a>
+            </template>
+            <div class="dropdown-footer">
+              <a href="#">View all</a>
+            </div>
+          </div>
+
+          <!-- User profile dropdown -->
+          <div class="dropdown-menu dropdown-menu-lg" :class="{'show': activeDropdown === 'profile'}">
+            <div class="user-header">
+              <img :src="user.avatar" alt="User avatar" class="user-header-avatar">
+              <div>
+                <div class="user-name" x-text="user.name"></div>
+                <div class="user-role" x-text="user.role"></div>
+              </div>
+            </div>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-user" style="width: 20px; margin-right: 10px;"></i> Profile
+            </a>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-cog" style="width: 20px; margin-right: 10px;"></i> Settings
+            </a>
+            <div class="dropdown-footer">
+              <a href="#"><i class="fas fa-sign-out-alt"></i> Log out</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <div class="wrapper">
+      <!-- Sidebar -->
+      <aside class="main-sidebar" :class="{
+        'sidebar-open': isSidebarOpen,
+        'sidebar-closed': !isSidebarOpen,
+        'sidebar-collapse': isSidebarCollapsed
+      }">
+        <!-- Logo -->
+        <div class="brand-link">
+          <span class="brand-text">ModernAdmin</span>
+        </div>
+
+        <!-- Sidebar Content -->
+        <div class="sidebar">
+          <!-- User panel -->
+          <div class="user-panel">
+            <div class="user-img">
+              <img :src="user.avatar" alt="User avatar" class="user-avatar">
+            </div>
+            <div class="user-info">
+              <a href="#" x-text="user.name"></a>
+            </div>
+          </div>
+
+          <!-- Sidebar menu -->
+          <nav class="sidebar-menu">
+            <ul class="nav-list">
+              <li class="nav-item">
+                <a href="#" class="nav-link" :class="{'active': activeMenu === 'dashboard'}" @click.prevent="setActiveMenu('dashboard')">
+                  <i class="nav-icon fas fa-tachometer-alt"></i>
+                  <span class="nav-link-text">Dashboard</span>
+                </a>
+              </li>
+
+              <li class="nav-item" :class="{'menu-open': isSubmenuOpen('layouts')}">
+                <a href="#" class="nav-link" @click.prevent="toggleSubmenu('layouts')">
+                  <i class="nav-icon fas fa-columns"></i>
+                  <span class="nav-link-text">
+                    Layouts
+                    <i class="fas fa-angle-left menu-arrow"></i>
+                  </span>
+                </a>
+                <ul class="nav-treeview" x-show="isSubmenuOpen('layouts')">
+                  <li class="nav-item">
+                    <a href="#" class="nav-link" :class="{'active': activeMenu === 'layout-fixed'}" @click.prevent="setActiveMenu('layout-fixed')">
+                      <i class="nav-icon far fa-circle"></i>
+                      <span class="nav-link-text">Fixed Layout</span>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#" class="nav-link" :class="{'active': activeMenu === 'layout-boxed'}" @click.prevent="setActiveMenu('layout-boxed')">
+                      <i class="nav-icon far fa-circle"></i>
+                      <span class="nav-link-text">Boxed Layout</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+
+              <li class="nav-header">EXAMPLES</li>
+
+              <li class="nav-item">
+                <a href="#" class="nav-link" :class="{'active': activeMenu === 'calendar'}" @click.prevent="setActiveMenu('calendar')">
+                  <i class="nav-icon fas fa-calendar"></i>
+                  <span class="nav-link-text">
+                    Calendar
+                    <span class="badge bg-success" style="float: right; background-color: var(--success); margin-left: 5px;">2</span>
+                  </span>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="#" class="nav-link" :class="{'active': activeMenu === 'charts'}" @click.prevent="setActiveMenu('charts')">
+                  <i class="nav-icon fas fa-chart-pie"></i>
+                  <span class="nav-link-text">Charts</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <div class="content-wrapper" :class="{
+        'content-shifted': isSidebarOpen && isLargeScreen(),
+        'content-collapsed': isSidebarCollapsed && isLargeScreen() && isSidebarOpen
+      }">
+        <!-- Content header -->
+        <div class="content-header">
+          <div class="content-header-row">
+            <h1 class="content-title">Dashboard</h1>
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Dashboard</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+          <div class="container-fluid">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Welcome</h3>
+                <div class="card-tools">
+                  <button class="btn-tool" aria-label="Minimize">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button class="btn-tool" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <p>Welcome to the improved admin dashboard.</p>
+                <p>This layout has been optimized for better performance and usability.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+          <strong>Copyright &copy; 2025 <a href="#">Dashboard layout</a></strong>
+          <div><span>Version 0.0.1</span></div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Sidebar overlay (for mobile) -->
+    <div class="sidebar-overlay" :class="{'active': isSidebarOpen && !isLargeScreen()}" @click="closeSidebar()"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
