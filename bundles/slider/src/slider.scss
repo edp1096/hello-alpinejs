@@ -67,6 +67,17 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         aspect-ratio: 1080/480;
 
+        touch-action: pan-y pinch-zoom; // Solve swipe e.preventDefault issue
+        cursor: grab;
+
+        &:active {
+            cursor: grabbing;
+        }
+
+        &.no-fillet {
+            border-radius: 0px;
+        }
+
         @media (max-width: 768px) {
             border-radius: unset; // 모바일에서 border-radius 제거
         }
@@ -81,6 +92,8 @@
             // For slide mode
             display: flex;
             flex-wrap: nowrap;
+            transition: transform 0.3s ease;
+            will-change: transform;
 
             &.fade-transition {
                 display: block;

@@ -16,6 +16,22 @@
             </div>
 
             <div class="option-group">
+                <h3>모서리 설정</h3>
+                <label class="toggle-switch">
+                    <input type="checkbox" x-model="noFillet">
+                    <span>각진 모서리 사용</span>
+                </label>
+            </div>
+
+            <div class="option-group">
+                <h3>스와이프 설정(슬라이드 설정 필요)</h3>
+                <label class="toggle-switch">
+                    <input type="checkbox" x-model="useSwipe">
+                    <span>스와이프 활성화</span>
+                </label>
+            </div>
+
+            <div class="option-group">
                 <h3>자동 재생 설정</h3>
                 <label class="toggle-switch">
                     <input type="checkbox" x-model="autoplayEnabled">
@@ -63,7 +79,7 @@
         </div>
     </template>
 
-    <div class="carousel-container">
+    <div class="carousel-container" :class="{ 'no-fillet': noFillet }">
         <div class="carousel-inner" :style="transitionType == 'slide' ? 
                     `transform: translateX(${-currentIndex * 100}%); transition: transform ${transitionDuration}s ease;` : 
                     ''" :class="{'fade-transition': transitionType == 'fade'}">

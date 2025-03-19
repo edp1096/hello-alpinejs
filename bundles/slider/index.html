@@ -75,14 +75,20 @@
         <p>슬라이더 태그를 직접 HTML에 배치하고 JavaScript로 업데이트합니다.</p>
 
         <!-- 직접 HTML에 배치된 슬라이더 태그 -->
-        <my-slider id="direct-slider"></my-slider>
+        <my-slider id="direct-slider" no-fillet="true"></my-slider>
         <br>
         <button id="init-slider">슬라이더 초기화</button>
         <button id="update-slider">슬라이더 업데이트</button>
 
         <div class="code-example">
-            <pre><code>// HTML에 직접 배치한 태그
+            <pre>
+                <code>
+&lt;!-- HTML에 직접 배치한 태그 --&gt;
 &lt;my-slider id="direct-slider"&gt;&lt;/my-slider&gt;
+&lt;!-- HTML에 직접 배치한 태그 - 각진 모서리 사용 --&gt;
+&lt;my-slider id="direct-slider" no-fillet="true"&gt;&lt;/my-slider&gt;
+&lt;!-- HTML에 직접 배치한 태그 - 스와이프 사용 (트랜지션은 슬라이드로 설정 필요) --&gt;
+&lt;my-slider id="direct-slider" swipe="true"&gt;&lt;/my-slider&gt;
 
 // 초기 설정 적용
 document.getElementById('init-slider').addEventListener('click', function() {
@@ -90,7 +96,7 @@ document.getElementById('init-slider').addEventListener('click', function() {
     
     // 초기 설정
     const initialConfig = {
-        transitionType: "slide",
+        transitionType: "fade",
         autoplayEnabled: true,
         interval: 5,
         showIndicators: true,
@@ -115,11 +121,13 @@ document.getElementById('update-slider').addEventListener('click', function() {
     
     // 업데이트 설정
     const updatedConfig = {
-        transitionType: "fade",
+        transitionType: "slide",
         autoplayEnabled: true,
         interval: 3,
         showIndicators: true,
         showControl: true,
+        noFillet: false,
+        useSwipe: true,
         images: [
             { src: "./images/3.jpg", alt: "이미지 3", href: "#" },
             { src: "./images/4.jpg", alt: "이미지 4", href: "#" },
@@ -148,7 +156,7 @@ document.getElementById('update-slider').addEventListener('click', function() {
             const slider = document.getElementById('direct-slider');
 
             const initialConfig = {
-                transitionType: "slide",
+                transitionType: "fade",
                 autoplayEnabled: true,
                 interval: 5,
                 showIndicators: true,
@@ -172,11 +180,12 @@ document.getElementById('update-slider').addEventListener('click', function() {
                 const slider = document.getElementById('direct-slider');
 
                 const updatedConfig = {
-                    transitionType: "fade",
+                    transitionType: "slide",
                     autoplayEnabled: true,
                     interval: 3,
                     showIndicators: true,
                     showControl: true,
+                    useSwipe: true,
                     images: [
                         { src: "./images/3.jpg", alt: "이미지 3", href: "#" },
                         { src: "./images/4.jpg", alt: "이미지 4", href: "#" },
