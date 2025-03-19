@@ -169,6 +169,7 @@
                 "2025-03-20", "2025-03-21", "2025-03-22", "2025-03-23", "2025-03-24", "2025-03-25", "2025-03-26", "2025-03-27", "2025-03-28", "2025-03-29",
                 "2025-03-30", "2025-03-31", "2025-04-01", "2025-04-02", "2025-04-03", "2025-04-04", "2025-04-05", "2025-04-06", "2025-04-07", "2025-04-08",
             ],
+            selectedDates: ["2025-03-31", "2025-04-01"],
             init() {
                 this.$watch('open', (value) => { if (value) { this.action(); } });
             },
@@ -182,7 +183,8 @@
                     calendarElement.setAttribute('config', JSON.stringify({
                         showCalendarCount: 2,
                         selectMode: this.selectMode || 'multiple',
-                        availableDates: this.availableDates
+                        availableDates: this.availableDates,
+                        selectedDates: this.selectedDates
                     }));
 
                     calendarElement.addEventListener('date-selected', (event) => {

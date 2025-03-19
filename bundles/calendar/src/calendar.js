@@ -208,11 +208,11 @@ const CalendarEntryController = (initialYear, initialMonth) => {
             const startYear = currentYear - 10; // 현재 연도로부터 10년 전
             const endYear = currentYear + 10; // 현재 연도로부터 10년 후
             const years = [];
-            
+
             for (let year = startYear; year <= endYear; year++) {
                 years.push(year);
             }
-            
+
             return years;
         },
 
@@ -269,15 +269,20 @@ const CalendarModuleController = (config = {}) => {
 
         async init() {
             this.$watch("selectMode", () => { this.clearSelection(); });
+
             // Random available dates for demo
             if (this.availables[0] == "random") {
                 this.setAvailables(this.createRandomAvailableDates());
             }
 
+            this.selectedDate = config.selectedDate || null;
+            this.selectedDates = config.selectedDates || [];
+
             if (this.showCalendarCount > 1) {
                 await this.$nextTick();
                 this.updateShowMonthCount(this.showCalendarCount)
             }
+
         },
 
         createRandomAvailableDates() {
@@ -515,7 +520,9 @@ class CalendarElement extends HTMLElement {
         this._config = {
             showCalendarCount: 1,
             selectMode: 'single',
-            availableDates: []
+            availableDates: [],
+            selectedDate: null,
+            selectedDates: []
         };
 
         // // 디버깅을 위한 로그 추가
@@ -701,8 +708,8 @@ class CalendarElement extends HTMLElement {
                     }
                 };
                 console.log('Selection listeners setup complete');
-            // } else {
-            //     console.warn('Calendar module element not found or Alpine data not initialized');
+                // } else {
+                //     console.warn('Calendar module element not found or Alpine data not initialized');
             }
         } catch (e) {
             console.warn('Error setting up date selection listeners:', e);

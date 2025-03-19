@@ -67,6 +67,10 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         aspect-ratio: 1080/480;
 
+        @media (max-width: 768px) {
+            border-radius: unset; // 모바일에서 border-radius 제거
+        }
+
         .carousel-inner {
             position: absolute;
             top: 0;
