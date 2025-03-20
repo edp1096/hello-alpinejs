@@ -246,6 +246,14 @@ if (typeof document != 'undefined') {
                 if (toast) { toast.mount(el); }
             });
 
+            // 토스트 태그가 없으면 자동으로 생성
+            if (!document.querySelector('my-toast')) {
+                const globalToast = document.createElement('my-toast');
+                globalToast.id = 'global-toast';
+                document.body.appendChild(globalToast);
+                registerToast();
+            }
+
             // // 커스텀 태그 정의 알림
             // if (typeof customElements !== 'undefined') {
             //     customElements.whenDefined('my-toast').then(() => {
