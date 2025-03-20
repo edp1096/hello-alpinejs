@@ -65,7 +65,14 @@
         overflow: hidden;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        aspect-ratio: 1080/480;
+
+        // aspect-ratio: 1080/480;
+        &::before {
+            content: '';
+            display: block;
+            padding-top: var(--ratio, 44.44%);
+            /* 1080:480 = 44.44% */
+        }
 
         touch-action: pan-y pinch-zoom; // Solve swipe e.preventDefault issue
         cursor: grab;

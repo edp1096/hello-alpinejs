@@ -24,6 +24,29 @@
             </div>
 
             <div class="option-group">
+                <h3>비율 설정</h3>
+                <label>
+                    <input type="radio" name="ratioOption" value="1080/480" x-model="ratio">
+                    와이드 (1080:480)
+                </label>
+                <label>
+                    <input type="radio" name="ratioOption" value="1080/720" x-model="ratio">
+                    표준 (1080:720)
+                </label>
+                <label>
+                    <input type="radio" name="ratioOption" value="1080/1080" x-model="ratio">
+                    정사각형 (1:1)
+                </label>
+                <label>
+                    <input type="radio" name="ratioOption" value="custom" x-model="customRatioSelected">
+                    직접 입력
+                </label>
+                <div x-show="customRatioSelected === 'custom'" style="margin-top: 8px;">
+                    <input type="text" placeholder="가로/세로 (예: 16/9)" @input="if ($event.target.value) ratio = $event.target.value" style="width: 120px; padding: 4px;">
+                </div>
+            </div>
+
+            <div class="option-group">
                 <h3>스와이프 설정(슬라이드 설정 필요)</h3>
                 <label class="toggle-switch">
                     <input type="checkbox" x-model="useSwipe">

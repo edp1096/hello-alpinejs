@@ -57,6 +57,11 @@ export function registerSlider(config = {}) {
                     localConfig.noFillet = this.getAttribute('no-fillet') !== 'false';
                 }
 
+                // ratio
+                if (this.hasAttribute('ratio')) {
+                    localConfig.ratio = this.getAttribute('ratio');
+                }
+
                 // swipe
                 if (this.hasAttribute('swipe')) {
                     localConfig.useSwipe = this.getAttribute('swipe') !== 'false';
@@ -135,6 +140,11 @@ export function registerSlider(config = {}) {
             minSwipeDistance: 50,
             swipeThreshold: 0.15,
 
+            // Aspect ratio
+            ratio: '1080/480',
+            customRatioSelected: false,
+            customRatio: '',
+
             init() {
                 // 요소의 ID를 확인하고 해당 설정 가져오기
                 if (this.$el && this.$el.closest('my-slider') && this.$el.closest('my-slider').id) {
@@ -155,7 +165,7 @@ export function registerSlider(config = {}) {
                         if (sliderConfig.showControl !== undefined) this.showControl = sliderConfig.showControl;
                         if (sliderConfig.noFillet !== undefined) this.noFillet = sliderConfig.noFillet;
                         if (sliderConfig.useSwipe !== undefined) this.useSwipe = sliderConfig.useSwipe;
-
+                        if (sliderConfig.ratio) this.ratio = sliderConfig.ratio;
 
                         // 이미지 설정 (가장 중요!)
                         if (sliderConfig.images && Array.isArray(sliderConfig.images)) {
@@ -180,6 +190,10 @@ export function registerSlider(config = {}) {
                     container.addEventListener('mouseenter', () => { if (this.autoplayEnabled) this.stopAutoplay(); });
                     container.addEventListener('mouseleave', () => { if (this.autoplayEnabled) this.startAutoplay(); });
                 }
+
+
+                this.$nextTick(() => { this.updateRatioStyle(); });
+                this.$watch('ratio', () => { this.updateRatioStyle(); });
 
                 this.$watch('transitionType', () => { });
 
@@ -243,6 +257,28 @@ export function registerSlider(config = {}) {
             },
             stopAutoplay() { clearInterval(this.autoplayInterval); },
 
+            // ratio를 CSS 변수로 적용
+            updateRatioStyle() {
+                const container = this.$el.querySelector('.carousel-container');
+                if (container) {
+                    // ratio가 "가로/세로" 형식인 경우 계산
+                    if (this.ratio.includes('/')) {
+                        const [width, height] = this.ratio.split('/').map(Number);
+                        if (!isNaN(width) && !isNaN(height) && height > 0) {
+                            const percentage = (height / width) * 100;
+                            container.style.setProperty('--ratio', `${percentage}%`);
+                        }
+                    }
+                    // ratio가 직접 퍼센트 값인 경우
+                    else if (this.ratio.includes('%')) {
+                        container.style.setProperty('--ratio', this.ratio);
+                    }
+                    // 기본값 설정
+                    else {
+                        container.style.setProperty('--ratio', '44.44%');
+                    }
+                }
+            },
 
             // Swipe 핸들러 설정
             setupSwipeHandlers() {

@@ -93,24 +93,26 @@
 // 초기 설정 적용
 document.getElementById('init-slider').addEventListener('click', function() {
     const slider = document.getElementById('direct-slider');
-    
+
     // 초기 설정
     const initialConfig = {
-        transitionType: "fade",
-        autoplayEnabled: true,
-        interval: 5,
-        showIndicators: true,
+        transitionType: "fade", // 이미지 변경 효과
+        autoplayEnabled: true,  // 자동 재생
+        interval: 5,            // 대기시간
+        showIndicators: true,   // 아래 점 표시
+        ratio: "1080/720",      // 가로세로 비율
+        swipe: true,            // 스와이프 사용
         images: [
             { src: "./images/1.jpg", alt: "이미지 1", href: "#" },
             { src: "./images/2.jpg", alt: "이미지 2", href: "#" }
         ]
     };
-    
+
     // 기존 슬라이더 교체 (새로운 슬라이더로)
     const newSlider = document.createElement('my-slider');
     newSlider.id = "direct-slider";
     newSlider.setAttribute('config', JSON.stringify(initialConfig));
-    
+
     // 기존 슬라이더와 교체
     slider.replaceWith(newSlider);
 });
@@ -118,7 +120,7 @@ document.getElementById('init-slider').addEventListener('click', function() {
 // 슬라이더 업데이트
 document.getElementById('update-slider').addEventListener('click', function() {
     const slider = document.getElementById('direct-slider');
-    
+
     // 업데이트 설정
     const updatedConfig = {
         transitionType: "slide",
@@ -134,15 +136,23 @@ document.getElementById('update-slider').addEventListener('click', function() {
             { src: "./images/5.jpg", alt: "이미지 5", href: "#" }
         ]
     };
-    
+
     // 기존 슬라이더 교체 (새로운 슬라이더로)
     const newSlider = document.createElement('my-slider');
     newSlider.id = "direct-slider";
     newSlider.setAttribute('config', JSON.stringify(updatedConfig));
-    
+
     // 기존 슬라이더와 교체
     slider.replaceWith(newSlider);
-});</code></pre>
+});
+
+// 슬라이더 초기화 (시작)
+document.addEventListener('DOMContentLoaded', () => {
+    if (SliderComponent) {
+        SliderComponent.registerSlider();
+    }
+});
+</code></pre>
         </div>
     </div>
 
@@ -185,6 +195,7 @@ document.getElementById('update-slider').addEventListener('click', function() {
                     interval: 3,
                     showIndicators: true,
                     showControl: true,
+                    ratio: "1080/720",
                     useSwipe: true,
                     images: [
                         { src: "./images/3.jpg", alt: "이미지 3", href: "#" },
