@@ -42,6 +42,11 @@ export function registerSlider(config = {}) {
                     localConfig.imagePosition = this.getAttribute('image-position');
                 }
 
+                // arrows
+                if (this.hasAttribute('show-arrows')) {
+                    localConfig.showArrows = this.getAttribute('show-arrows') !== 'false';
+                }
+
                 // indicators
                 if (this.hasAttribute('indicators')) {
                     localConfig.showIndicators = this.getAttribute('indicators') !== 'false';
@@ -123,6 +128,7 @@ export function registerSlider(config = {}) {
             interval: 5, // Play interval (seconds)
             transitionDuration: 1.2, // Transition time (seconds)
             imagePosition: 'center', // Image position
+            showArrows: true, // Show prev/next arrows
             showIndicators: true, // Show indicators
             showControl: false, // Show options panel
             noFillet: false, // Use border-radius
@@ -161,6 +167,7 @@ export function registerSlider(config = {}) {
                         if (sliderConfig.interval) this.interval = sliderConfig.interval;
                         if (sliderConfig.transitionDuration) this.transitionDuration = sliderConfig.transitionDuration;
                         if (sliderConfig.imagePosition) this.imagePosition = sliderConfig.imagePosition;
+                        if (sliderConfig.showArrows !== undefined) this.showArrows = sliderConfig.showArrows;
                         if (sliderConfig.showIndicators !== undefined) this.showIndicators = sliderConfig.showIndicators;
                         if (sliderConfig.showControl !== undefined) this.showControl = sliderConfig.showControl;
                         if (sliderConfig.noFillet !== undefined) this.noFillet = sliderConfig.noFillet;

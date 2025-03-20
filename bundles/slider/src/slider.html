@@ -93,6 +93,14 @@
             </div>
 
             <div class="option-group">
+                <h3>화살표 설정</h3>
+                <label class="toggle-switch">
+                    <input type="checkbox" x-model="showArrows">
+                    <span>화살표 버튼 표시</span>
+                </label>
+            </div>
+
+            <div class="option-group">
                 <h3>인디케이터 설정</h3>
                 <label class="toggle-switch">
                     <input type="checkbox" x-model="showIndicators">
@@ -116,14 +124,18 @@
         </div>
 
         <!-- Prev/Next -->
-        <button class="carousel-control prev" @click="prev()" aria-label="이전 슬라이드">
-            &#10094;
-        </button>
-        <button class="carousel-control next" @click="next()" aria-label="다음 슬라이드">
-            &#10095;
-        </button>
+        <template x-if="showArrows">
+            <div>
+                <button class="carousel-control prev" @click="prev()" aria-label="이전 슬라이드">
+                    &#10094;
+                </button>
+                <button class="carousel-control next" @click="next()" aria-label="다음 슬라이드">
+                    &#10095;
+                </button>
+            </div>
+        </template>
 
-        <!-- Indicator - 조건부 표시 추가 -->
+        <!-- Indicator -->
         <template x-if="showIndicators">
             <div class="carousel-indicators">
                 <template x-for="(image, index) in images" :key="index">
