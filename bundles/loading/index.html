@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Hooks 데모 - 로딩, 네비게이션, 클릭 훅</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4bb543;
+            --info: #4895ef;
+            --warning: #f9c74f;
+            --danger: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--secondary);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+            margin-top: 25px;
+        }
+
+        h3 {
+            color: var(--dark);
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--light);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header .badge {
+            background-color: var(--info);
+            color: white;
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        button,
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover,
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+
+        button:active,
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        button.btn-success {
+            background-color: var(--success);
+        }
+
+        button.btn-info {
+            background-color: var(--info);
+        }
+
+        button.btn-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+
+        button.btn-danger {
+            background-color: var(--danger);
+        }
+
+        button.btn-light {
+            background-color: var(--light);
+            color: var(--dark);
+            border: 1px solid #ddd;
+        }
+
+        button.btn-dark {
+            background-color: var(--dark);
+        }
+
+        button:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .log-container {
+            margin-top: 30px;
+        }
+
+        .log-area {
+            background-color: #1e1e1e;
+            color: #a4e400;
+            font-family: 'Consolas', 'Monaco', monospace;
+            padding: 15px;
+            border-radius: 4px;
+            height: 250px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px dotted #333;
+            padding-bottom: 3px;
+        }
+
+        .log-entry .timestamp {
+            color: #ff7b00;
+            margin-right: 8px;
+        }
+
+        .log-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .log-filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background-color: white;
+            border-color: #ddd;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* URL 표시 영역 */
+        .url-display {
+            background-color: var(--light);
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        /* 코드 영역 */
+        .code {
+            background-color: #f5f5f5;
+            border-left: 4px solid var(--primary);
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+
+        /* 애니메이션 효과 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* 반응형 스타일 */
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group button {
+                width: 100%;
+            }
+        }
+    </style>
+    <!-- Hooks 라이브러리 스타일 로드 -->
+    <link rel="stylesheet" href="dist/hooks-styles.css">
+</head>
+
+<body data-hooks-auto>
+    <header>
+        <h1>UI Hooks 데모</h1>
+        <p>로딩, 네비게이션, 클릭 이벤트 자동 감지 및 로딩 화면 표시 테스트</p>
+    </header>
+
+    <!-- 1. 기본 로딩 테스트 -->
+    <div class="card">
+        <div class="card-header">
+            <span>1. 기본 로딩 컨트롤</span>
+            <span class="badge">LoadingHook</span>
+        </div>
+        <p>로딩 화면을 수동으로 표시하고 숨길 수 있습니다.</p>
+        <div class="button-group">
+            <button onclick="Hooks.loading.show()">로딩 표시</button>
+            <button onclick="Hooks.loading.hide()">로딩 숨김</button>
+            <button onclick="testLoadingDuration(1000)">1초 로딩</button>
+            <button onclick="testLoadingDuration(3000)">3초 로딩</button>
+            <button onclick="testDuringMethod()">during() 메서드 테스트</button>
+        </div>
+    </div>
+
+    <!-- 2. 바닐라 JS 테스트 -->
+    <div class="card">
+        <div class="card-header">
+            <span>2. 바닐라 JavaScript 테스트</span>
+            <span class="badge">ClickHook</span>
+        </div>
+
+        <h3>2.1 onClick 속성 테스트</h3>
+        <div class="button-group">
+            <button onclick="simulateNavigation()">location.href로 이동</button>
+            <button onclick="simulateSearch()">location.search 변경</button>
+            <button onclick="window.location.hash = 'section-' + Date.now()">해시 변경 (로딩 없음)</button>
+        </div>
+
+        <h3>2.2 a 태그 테스트</h3>
+        <div class="button-group">
+            <a href="?test=1" class="btn">쿼리스트링 변경</a>
+            <a href="#hash-link" class="btn btn-info">해시 링크 (로딩 없음)</a>
+            <a href="https://example.com" target="_blank" class="btn btn-warning">외부 링크 (새 탭)</a>
+        </div>
+    </div>
+
+    <!-- 3. 네비게이션 테스트 -->
+    <div class="card">
+        <div class="card-header">
+            <span>3. 네비게이션 API 테스트</span>
+            <span class="badge">NavigationHook</span>
+        </div>
+
+        <p>현재 URL: <span id="current-url" class="url-display"></span></p>
+
+        <div class="button-group">
+            <button onclick="testPushState()">history.pushState()</button>
+            <button onclick="testReplaceState()">history.replaceState()</button>
+            <button onclick="testLocationAssign()">location.assign()</button>
+            <button onclick="testLocationReplace()">location.replace()</button>
+            <button onclick="window.history.back()">뒤로가기</button>
+            <button onclick="window.history.forward()">앞으로가기</button>
+        </div>
+    </div>
+
+    <!-- 4. Alpine.js 테스트 -->
+    <div class="card">
+        <div class="card-header">
+            <span>4. Alpine.js 테스트</span>
+            <span class="badge">Alpine.js Hooks</span>
+        </div>
+
+        <div x-data="{ count: 0, searchQuery: '', showContent: false }">
+            <h3>4.1 기본 이벤트</h3>
+            <div class="button-group">
+                <button @click="count++" class="btn-light">카운터 증가 (로딩 없음)</button>
+                <button @click="doSearch()" class="btn-primary">검색 (로딩 있음)</button>
+                <button @click="showAdvancedContent()" class="btn-info">컨텐츠 표시 (지연 있음)</button>
+            </div>
+
+            <div class="form-group" x-show="showContent" style="display: none;">
+                <h3>4.2 고급 입력</h3>
+                <input type="text" x-model="searchQuery" placeholder="검색어 입력">
+                <button @click="applySearch(searchQuery)" class="btn-success">검색 적용</button>
+                <p x-show="searchQuery.length > 0">검색어: <strong x-text="searchQuery"></strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 네트워크 요청 시뮬레이션 -->
+    <div class="card">
+        <div class="card-header">
+            <span>5. 네트워크 요청 시뮬레이션</span>
+            <span class="badge">Network Hooks</span>
+        </div>
+        <p>fetch()와 XMLHttpRequest 요청 시 자동으로 로딩 화면이 표시됩니다.</p>
+        <div class="button-group">
+            <button onclick="testFetch()">fetch() 요청</button>
+            <button onclick="testXHR()">XMLHttpRequest 요청</button>
+        </div>
+    </div>
+
+    <!-- 로그 영역 -->
+    <div class="card log-container">
+        <div class="card-header">
+            <span>이벤트 로그</span>
+        </div>
+        <div class="log-controls">
+            <div class="log-filters">
+                <button onclick="filterLogs('all')" class="btn-light">전체</button>
+                <button onclick="filterLogs('loading')" class="btn-info">로딩 이벤트</button>
+                <button onclick="filterLogs('navigation')" class="btn-success">네비게이션</button>
+                <button onclick="filterLogs('click')" class="btn-warning">클릭</button>
+            </div>
+            <button onclick="clearLogs()" class="btn-danger">로그 지우기</button>
+        </div>
+        <div id="log-area" class="log-area"></div>
+    </div>
+
+    <!-- Alpine.js 로드 -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+    <!-- Hooks 라이브러리 로드 (직접 개발한 모듈) -->
+    <script src="dist/hooks-bundle.js"></script>
+
+    <script>
+        // 로그 기능
+        const logArea = document.getElementById('log-area');
+        let logFilter = 'all';
+
+        function addLog(category, message) {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${category}`;
+
+            const timestamp = document.createElement('span');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = new Date().toLocaleTimeString();
+
+            entry.appendChild(timestamp);
+            entry.appendChild(document.createTextNode(message));
+
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+
+            console.log(`[${category}] ${message}`);
+        }
+
+        function filterLogs(filter) {
+            logFilter = filter;
+            const entries = logArea.querySelectorAll('.log-entry');
+
+            entries.forEach(entry => {
+                if (filter === 'all') {
+                    entry.style.display = '';
+                } else {
+                    entry.style.display = entry.classList.contains(`log-${filter}`) ? '' : 'none';
+                }
+            });
+        }
+
+        function clearLogs() {
+            logArea.innerHTML = '';
+        }
+
+        // 1. 기본 로딩 테스트 함수
+        function testLoadingDuration(duration) {
+            addLog('loading', `${duration / 1000}초 동안 로딩 표시`);
+            Hooks.loading.show();
+
+            setTimeout(() => {
+                Hooks.loading.hide();
+                addLog('loading', `${duration / 1000}초 로딩 완료`);
+            }, duration);
+        }
+
+        function testDuringMethod() {
+            addLog('loading', 'during() 메서드 테스트 시작');
+
+            Hooks.loading.during(async () => {
+                addLog('loading', '비동기 작업 시작...');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                addLog('loading', '비동기 작업 완료 (2초)');
+                return "작업 결과";
+            }).then(result => {
+                addLog('loading', `반환된 결과: ${result}`);
+            });
+        }
+
+        // 2. 바닐라 JS 테스트 함수
+        function simulateNavigation() {
+            addLog('navigation', 'location.href로 이동 시도');
+            window.location.href = '?page=test&time=' + Date.now();
+        }
+
+        function simulateSearch() {
+            addLog('navigation', 'location.search 변경 시도');
+            window.location.search = 'search=test&time=' + Date.now();
+        }
+
+        // 3. 네비게이션 테스트 함수
+        function updateUrlDisplay() {
+            document.getElementById('current-url').textContent = window.location.href;
+        }
+
+        function testPushState() {
+            const state = { page: 'test', time: Date.now() };
+            const title = 'Push State Test';
+            const url = '?page=pushed&time=' + Date.now();
+
+            addLog('navigation', `pushState 호출: ${url}`);
+            history.pushState(state, title, url);
+            updateUrlDisplay();
+        }
+
+        function testReplaceState() {
+            const state = { page: 'test', time: Date.now() };
+            const title = 'Replace State Test';
+            const url = '?page=replaced&time=' + Date.now();
+
+            addLog('navigation', `replaceState 호출: ${url}`);
+            history.replaceState(state, title, url);
+            updateUrlDisplay();
+        }
+
+        function testLocationAssign() {
+            const url = '?page=assigned&time=' + Date.now();
+            addLog('navigation', `location.assign() 호출: ${url}`);
+            window.location.assign(url);
+        }
+
+        function testLocationReplace() {
+            const url = '?page=replaced&time=' + Date.now();
+            addLog('navigation', `location.replace() 호출: ${url}`);
+            window.location.replace(url);
+        }
+
+        // 4. Alpine.js 테스트 함수
+        function setupAlpineJsFunctions() {
+            window.doSearch = function () {
+                addLog('click', 'Alpine.js doSearch() 함수 호출');
+                setTimeout(() => {
+                    addLog('click', 'Alpine.js 검색 완료 (1초)');
+                }, 1000);
+            };
+
+            window.showAdvancedContent = function () {
+                addLog('click', 'Alpine.js 고급 컨텐츠 표시 시작');
+                setTimeout(() => {
+                    document.querySelector('[x-show="showContent"]').style.display = 'block';
+                    addLog('click', 'Alpine.js 컨텐츠 표시 완료');
+                }, 800);
+            };
+
+            window.applySearch = function (query) {
+                addLog('navigation', `Alpine.js 검색 적용: ${query}`);
+                const searchParams = new URLSearchParams(window.location.search);
+                searchParams.set('q', query);
+                searchParams.set('time', Date.now());
+                window.location.search = searchParams.toString();
+            };
+        }
+
+        // 5. 네트워크 요청 시뮬레이션
+        function testFetch() {
+            addLog('loading', 'fetch() 요청 시작 (JSONPlaceholder API)');
+
+            fetch('https://jsonplaceholder.typicode.com/todos/1')
+                .then(response => response.json())
+                .then(data => {
+                    addLog('loading', `fetch() 응답 받음: ${JSON.stringify(data)}`);
+                })
+                .catch(error => {
+                    addLog('loading', `fetch() 오류: ${error.message}`);
+                });
+        }
+
+        function testXHR() {
+            addLog('loading', 'XMLHttpRequest 요청 시작');
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://jsonplaceholder.typicode.com/todos/2');
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    addLog('loading', `XHR 응답 받음: ${xhr.responseText}`);
+                } else {
+                    addLog('loading', `XHR 오류 (${xhr.status}): ${xhr.statusText}`);
+                }
+            };
+
+            xhr.onerror = function () {
+                addLog('loading', 'XHR 네트워크 오류 발생');
+            };
+
+            xhr.send();
+        }
+
+        // 초기화 함수
+        function initDemo() {
+            // URL 표시 업데이트
+            updateUrlDisplay();
+
+            // Hooks 라이브러리 초기화
+            if (window.Hooks) {
+                Hooks.init({
+                    loading: { appendToBody: false, debug: true },
+                    detectNetwork: true,
+                    debug: true
+                });
+
+                // 모든 a 태그에 로딩 화면 자동 표시 설정 (외부 링크 제외)
+                Hooks.autoLoading('a:not([target="_blank"])');
+
+                // 네비게이션 이벤트 로깅
+                Hooks.navigation.addHook((event, info) => {
+                    addLog('navigation', `네비게이션 이벤트: ${info.action}`);
+                });
+
+                // 클릭 이벤트 로깅
+                Hooks.click.addHook((element, event, info) => {
+                    addLog('click', `클릭 이벤트: ${info.type} - ${element.tagName}`);
+                });
+
+                addLog('loading', 'Hooks 라이브러리 초기화 완료');
+            } else {
+                addLog('loading', '경고: Hooks 라이브러리를 찾을 수 없습니다!');
+                document.body.insertAdjacentHTML('afterbegin',
+                    '<div style="background-color:#f8d7da; color:#721c24; padding:10px; margin:10px 0; border-radius:4px;">' +
+                    '<strong>오류:</strong> Hooks 라이브러리를 로드할 수 없습니다. dist/hooks-bundle.js 파일이 있는지 확인하세요.' +
+                    '</div>');
+            }
+
+            // Alpine.js 함수 설정
+            setupAlpineJsFunctions();
+
+            addLog('loading', '데모 페이지 초기화 완료');
+        }
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', initDemo);
+
+        // 페이지 상태 변경 감지
+        window.addEventListener('popstate', function (event) {
+            addLog('navigation', 'popstate 이벤트 발생');
+            updateUrlDisplay();
+        });
+    </script>
+</body>
+
+</html>

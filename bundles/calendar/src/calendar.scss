@@ -63,6 +63,14 @@
                     background-color: #0095d1;
                     color: #ffffff;
                     font-weight: bold;
+
+                    &:disabled {
+                        background-color: #9fb5be;
+                        color: #306567;
+                        cursor: not-allowed;
+                        opacity: 0.7;
+                        border: 1px dashed #0095d1;
+                    }
                 }
 
                 &:disabled {
