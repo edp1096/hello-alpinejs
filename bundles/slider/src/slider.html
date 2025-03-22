@@ -46,6 +46,31 @@
                 </div>
             </div>
 
+            <!-- 모바일 비율 설정 추가 -->
+            <div class="option-group">
+                <h3>모바일 비율 설정</h3>
+                <p class="option-description">화면 너비가 768px 미만일 때 적용됩니다.</p>
+                <label>
+                    <input type="radio" name="mobileRatioOption" value="1/1" x-model="mobileRatio">
+                    정사각형 (1:1)
+                </label>
+                <label>
+                    <input type="radio" name="mobileRatioOption" value="9/16" x-model="mobileRatio">
+                    세로형 (9:16)
+                </label>
+                <label>
+                    <input type="radio" name="mobileRatioOption" value="4/5" x-model="mobileRatio">
+                    인스타그램 (4:5)
+                </label>
+                <label>
+                    <input type="radio" name="mobileRatioOption" value="custom" x-model="customMobileRatioSelected">
+                    직접 입력
+                </label>
+                <div x-show="customMobileRatioSelected === 'custom'" style="margin-top: 8px;">
+                    <input type="text" placeholder="가로/세로 (예: 9/16)" @input="if ($event.target.value) mobileRatio = $event.target.value" style="width: 120px; padding: 4px;">
+                </div>
+            </div>
+
             <div class="option-group">
                 <h3>스와이프 설정(슬라이드 설정 필요)</h3>
                 <label class="toggle-switch">

@@ -67,6 +67,11 @@ export function registerSlider(config = {}) {
                     localConfig.ratio = this.getAttribute('ratio');
                 }
 
+                // mobile-ratio
+                if (this.hasAttribute('mobile-ratio')) {
+                    localConfig.mobileRatio = this.getAttribute('mobile-ratio');
+                }
+
                 // swipe
                 if (this.hasAttribute('swipe')) {
                     localConfig.useSwipe = this.getAttribute('swipe') !== 'false';
@@ -151,7 +156,16 @@ export function registerSlider(config = {}) {
             customRatioSelected: false,
             customRatio: '',
 
+            // Mobile ratio
+            isMobile: false,
+            mobileRatio: '1/1',
+            customMobileRatioSelected: false,
+
             init() {
+                // 모바일 환경 확인
+                this.checkMobileEnvironment();
+                window.addEventListener('resize', () => this.checkMobileEnvironment());
+
                 // 요소의 ID를 확인하고 해당 설정 가져오기
                 if (this.$el && this.$el.closest('my-slider') && this.$el.closest('my-slider').id) {
                     const mySlider = this.$el.closest('my-slider');
@@ -173,6 +187,7 @@ export function registerSlider(config = {}) {
                         if (sliderConfig.noFillet !== undefined) this.noFillet = sliderConfig.noFillet;
                         if (sliderConfig.useSwipe !== undefined) this.useSwipe = sliderConfig.useSwipe;
                         if (sliderConfig.ratio) this.ratio = sliderConfig.ratio;
+                        if (sliderConfig.mobileRatio) this.mobileRatio = sliderConfig.mobileRatio;
 
                         // 이미지 설정 (가장 중요!)
                         if (sliderConfig.images && Array.isArray(sliderConfig.images)) {
@@ -201,6 +216,7 @@ export function registerSlider(config = {}) {
 
                 this.$nextTick(() => { this.updateRatioStyle(); });
                 this.$watch('ratio', () => { this.updateRatioStyle(); });
+                this.$watch('mobileRatio', () => { this.updateRatioStyle(); }); 
 
                 this.$watch('transitionType', () => { });
 
@@ -268,22 +284,34 @@ export function registerSlider(config = {}) {
             updateRatioStyle() {
                 const container = this.$el.querySelector('.carousel-container');
                 if (container) {
-                    // ratio가 "가로/세로" 형식인 경우 계산
-                    if (this.ratio.includes('/')) {
-                        const [width, height] = this.ratio.split('/').map(Number);
+                    // 현재 환경에 맞는 비율 선택
+                    const currentRatio = this.isMobile ? this.mobileRatio : this.ratio;
+
+                    if (currentRatio.includes('/')) {
+                        // ratio가 "가로/세로" 형식인 경우 계산
+                        const [width, height] = currentRatio.split('/').map(Number);
                         if (!isNaN(width) && !isNaN(height) && height > 0) {
                             const percentage = (height / width) * 100;
                             container.style.setProperty('--ratio', `${percentage}%`);
                         }
-                    }
-                    // ratio가 직접 퍼센트 값인 경우
-                    else if (this.ratio.includes('%')) {
-                        container.style.setProperty('--ratio', this.ratio);
-                    }
-                    // 기본값 설정
-                    else {
+                    } else if (currentRatio.includes('%')) {
+                        // ratio가 직접 퍼센트 값인 경우
+                        container.style.setProperty('--ratio', currentRatio);
+                    } else {
+                        // 기본값 설정
                         container.style.setProperty('--ratio', '44.44%');
                     }
+                }
+            },
+
+            // 모바일 환경 확인 함수 추가
+            checkMobileEnvironment() {
+                const prevIsMobile = this.isMobile;
+                this.isMobile = window.innerWidth < 768; // 768px 미만을 모바일로 간주
+
+                // 모바일 상태가 변경되었을 때만 비율 업데이트
+                if (prevIsMobile !== this.isMobile) {
+                    this.updateRatioStyle();
                 }
             },
 

@@ -27,6 +27,14 @@
                 font-size: 16px;
                 color: #333;
             }
+
+            // 모바일 비율 설정에 대한 설명 스타일 추가
+            .option-description {
+                font-size: 12px;
+                color: #666;
+                margin: 4px 0 8px;
+                font-style: italic;
+            }
         }
 
         label {
@@ -72,6 +80,7 @@
             display: block;
             padding-top: var(--ratio, 44.44%);
             /* 1080:480 = 44.44% */
+            transition: padding-top 0.3s ease;
         }
 
         touch-action: pan-y pinch-zoom; // Solve swipe e.preventDefault issue
@@ -85,8 +94,33 @@
             border-radius: 0px;
         }
 
-        @media (max-width: 768px) {
-            border-radius: unset; // 모바일에서 border-radius 제거
+        @media (max-width: 767px) {
+            max-width: 100%;
+            margin: 0;
+            // border-radius: 0; // 모바일에서는 모서리를 없앰
+            box-shadow: none; // 모바일에서는 그림자 제거
+
+            // ratio가 변경되었을 때 트랜지션이 자연스럽게 보이도록 오버플로우 처리
+            &::before {
+                will-change: padding-top;
+            }
+
+            // 모바일에서 이미지 포지션이 더 정확하게 적용되도록 함
+            .carousel-item img {
+                object-fit: cover;
+
+                &.img-top {
+                    object-position: center 0% !important;
+                }
+
+                &.img-center {
+                    object-position: center center !important;
+                }
+
+                &.img-bottom {
+                    object-position: center 100% !important;
+                }
+            }
         }
 
         .carousel-inner {

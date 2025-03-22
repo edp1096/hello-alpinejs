@@ -157,6 +157,99 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
 
+    <div class="section">
+        <h2>모바일 반응형 슬라이더 예제</h2>
+        <p>이 슬라이더는 데스크톱과 모바일에서 서로 다른 비율을 사용합니다. 브라우저 크기를 768px 미만으로 조절하여 모바일 비율을 확인해보세요.</p>
+
+        <!-- 모바일 비율이 적용된 슬라이더 -->
+        <my-slider id="responsive-slider"></my-slider>
+        <br>
+        <button id="init-responsive">슬라이더 초기화</button>
+
+        <div class="code-example">
+            <pre><code>
+&lt;!-- 모바일 비율이 적용된 슬라이더 --&gt;
+&lt;my-slider id="responsive-slider"&gt;&lt;/my-slider&gt;
+
+// 슬라이더 초기화
+document.getElementById('init-responsive').addEventListener('click', function() {
+    const slider = document.getElementById('responsive-slider');
+
+    // 설정
+    const config = {
+        transitionType: "slide",
+        autoplayEnabled: true,
+        interval: 4,
+        showArrows: true,
+        showIndicators: true,
+        showControl: true,
+        useSwipe: true,
+        // 데스크톱용 비율 (16:9)
+        ratio: "16/9",
+        // 모바일용 비율 (9:16 - 세로형)
+        mobileRatio: "9/16",
+        images: [
+            { src: "./images/1.jpg", alt: "이미지 1", href: "#" },
+            { src: "./images/2.jpg", alt: "이미지 2", href: "#" },
+            { src: "./images/3.jpg", alt: "이미지 3", href: "#" }
+        ]
+    };
+
+    // 기존 슬라이더 교체
+    const newSlider = document.createElement('my-slider');
+    newSlider.id = "responsive-slider";
+    newSlider.setAttribute('config', JSON.stringify(config));
+
+    slider.replaceWith(newSlider);
+});
+        </code></pre>
+        </div>
+    </div>
+
+    <!-- 스크립트 추가 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (SliderComponent) {
+                // 모바일 반응형 슬라이더 초기화
+                document.getElementById('init-responsive').addEventListener('click', function () {
+                    const slider = document.getElementById('responsive-slider');
+
+                    // 설정
+                    const config = {
+                        transitionType: "slide",
+                        autoplayEnabled: true,
+                        interval: 4,
+                        showArrows: true,
+                        showIndicators: true,
+                        showControl: true,
+                        useSwipe: true,
+                        // 데스크톱용 비율 (16:9)
+                        ratio: "16/9",
+                        // 모바일용 비율 (9:16 - 세로형)
+                        mobileRatio: "9/16",
+                        images: [
+                            { src: "./images/1.jpg", alt: "이미지 1", href: "#" },
+                            { src: "./images/2.jpg", alt: "이미지 2", href: "#" },
+                            { src: "./images/3.jpg", alt: "이미지 3", href: "#" }
+                        ]
+                    };
+
+                    // 기존 슬라이더 교체
+                    const newSlider = document.createElement('my-slider');
+                    newSlider.id = "responsive-slider";
+                    newSlider.setAttribute('config', JSON.stringify(config));
+
+                    slider.replaceWith(newSlider);
+                });
+
+                // 페이지 로드 시 자동 초기화
+                setTimeout(() => {
+                    document.getElementById('init-responsive').click();
+                }, 500);
+            }
+        });
+    </script>
+
     <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
     <script src="./dist/slider-bundle.js"></script>
 
@@ -185,33 +278,33 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Slider initialized');
         }
 
-        function updateSlider () {
-                console.log('Updating slider...');
+        function updateSlider() {
+            console.log('Updating slider...');
 
-                const slider = document.getElementById('direct-slider');
+            const slider = document.getElementById('direct-slider');
 
-                const updatedConfig = {
-                    transitionType: "slide",
-                    autoplayEnabled: true,
-                    interval: 3,
-                    showIndicators: true,
-                    showControl: true,
-                    ratio: "1080/720",
-                    useSwipe: true,
-                    images: [
-                        { src: "./images/3.jpg", alt: "이미지 3", href: "#" },
-                        { src: "./images/4.jpg", alt: "이미지 4", href: "#" },
-                        { src: "./images/5.jpg", alt: "이미지 5", href: "#" }
-                    ]
-                };
+            const updatedConfig = {
+                transitionType: "slide",
+                autoplayEnabled: true,
+                interval: 3,
+                showIndicators: true,
+                showControl: true,
+                ratio: "1080/720",
+                useSwipe: true,
+                images: [
+                    { src: "./images/3.jpg", alt: "이미지 3", href: "#" },
+                    { src: "./images/4.jpg", alt: "이미지 4", href: "#" },
+                    { src: "./images/5.jpg", alt: "이미지 5", href: "#" }
+                ]
+            };
 
-                const newSlider = document.createElement('my-slider');
-                newSlider.id = "direct-slider";
-                newSlider.setAttribute('config', JSON.stringify(updatedConfig));
+            const newSlider = document.createElement('my-slider');
+            newSlider.id = "direct-slider";
+            newSlider.setAttribute('config', JSON.stringify(updatedConfig));
 
-                slider.replaceWith(newSlider);
-                console.log('Slider updated');
-            }
+            slider.replaceWith(newSlider);
+            console.log('Slider updated');
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             if (SliderComponent) {
