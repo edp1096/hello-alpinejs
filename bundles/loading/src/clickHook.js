@@ -10,6 +10,12 @@ const ClickHook = (function () {
     const hooks = [];
     let initialized = false;
     let alpineInitialized = false;
+    let loadingCallback = null;
+
+    // 로딩 콜백
+    function setLoadingCallback(callback) {
+        loadingCallback = callback;
+    }
 
     /**
      * 클릭 훅 초기화
@@ -29,7 +35,7 @@ const ClickHook = (function () {
 
         // Alpine.js 초기화 이벤트 감지
         document.addEventListener('alpine:init', () => {
-            console.log('Alpine:init event detected');
+            // console.log('Alpine:init event detected');
             alpineInitialized = true;
         });
 
@@ -60,7 +66,7 @@ const ClickHook = (function () {
         // onclick 속성 처리
         if (clickableElement.hasAttribute('onclick')) {
             const onclickAttr = clickableElement.getAttribute('onclick') || '';
-            console.log('Onclick attribute detected:', onclickAttr);
+            // console.log('Onclick attribute detected:', onclickAttr);
 
             // 다양한 패턴 감지를 위한 로직
             const isNavigation =
@@ -115,30 +121,74 @@ const ClickHook = (function () {
         // Alpine.js 요소가 없으면 종료
         if (!alpineElement) return;
 
+        // no-loading-screen 속성 확인
+        if (alpineElement.hasAttribute('no-loading-screen')) {
+            // console.log('no-loading-screen 속성이 있는 요소, 로딩 화면 표시하지 않음');
+            return;
+        }
+
         // Alpine.js 속성 값 가져오기
         const expression = getAlpineClickExpression(alpineElement);
-        console.log('Alpine.js click detected:', expression);
+        // console.log('Alpine.js click detected:', expression);
 
-        // 네비게이션 패턴 더 정확히 체크
+        // 단순 변수 할당 패턴 감지 (로딩 화면 표시하지 않음)
+        const isSimpleAssignment = /^[a-zA-Z0-9_$]+\s*=\s*[^(;]+$/.test(expression) || // variable = value
+            /^[a-zA-Z0-9_$]+\s*=\s*!\s*[a-zA-Z0-9_$]+$/.test(expression) || // variable = !variable
+            /^[a-zA-Z0-9_$]+\.[a-zA-Z0-9_$]+\s*=\s*[^(;]+$/.test(expression); // object.property = value
+
+        if (isSimpleAssignment) {
+            // console.log('Simple assignment detected, not showing loading:', expression);
+
+            // 각 등록된 훅 호출 (네비게이션 아님으로 표시)
+            for (const hook of hooks) {
+                hook(alpineElement, event, {
+                    type: 'alpine',
+                    expression: expression,
+                    navigationPattern: false // 내비게이션 아님으로 표시
+                });
+            }
+            return; // 여기서 종료
+        }
+
+        // image.href 패턴 예외 처리
+        if (expression.includes('image.href')) {
+            // 슬라이더 이미지 클릭은 로딩 화면 표시하지 않음
+            // console.log('Slider image.href pattern detected in Alpine expression');
+
+            for (const hook of hooks) {
+                hook(alpineElement, event, {
+                    type: 'alpine',
+                    expression: expression,
+                    navigationPattern: false // 내비게이션으로 취급하지 않음
+                });
+            }
+
+            return;
+        }
+
+        // 내비게이션 패턴 더 정확히 체크
         const isNavigation =
             // location 관련 패턴
             expression.includes('location.href') ||
             expression.includes('location.replace') ||
             expression.includes('location.assign') ||
 
-            // // 특정 함수명 패턴 (정확히)
-            // expression.includes('gotoDetail(') ||
-            // expression.includes('navigate(') ||
-            // expression.includes('goToPage(') ||
-
             // window 객체의 특정 이동 함수 호출
             expression.match(/window\.goto[a-zA-Z0-9_]*\(/) ||
             expression.match(/window\.navigate[a-zA-Z0-9_]*\(/);
 
-        // 네비게이션으로 판단된 경우에만 로딩 화면 표시
-        if (isNavigation && Hooks && Hooks.loading) {
-            console.log('Alpine.js navigation detected:', expression);
-            Hooks.loading.show();
+        // 내비게이션으로 판단된 경우에만 로딩 화면 표시
+        // if (isNavigation && Hooks && Hooks.loading) {
+        //     console.log('Alpine.js navigation detected:', expression);
+        //     Hooks.loading.show();
+        // }
+        // if (isNavigation && window.Hooks && window.Hooks.loading) {
+        //     console.log('Alpine.js navigation detected:', expression);
+        //     window.Hooks.loading.show();
+        // }
+        if (isNavigation && typeof loadingCallback === 'function') {
+            // console.log('Alpine.js navigation detected:', expression);
+            loadingCallback(); // 콜백 함수 호출
         }
 
         // 각 등록된 훅 호출
@@ -213,7 +263,8 @@ const ClickHook = (function () {
     return {
         init,
         addHook,
-        removeHook
+        removeHook,
+        setLoadingCallback
     };
 })();
 

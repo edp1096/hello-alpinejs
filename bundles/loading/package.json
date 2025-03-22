@@ -2,7 +2,7 @@
     "name": "hooks-bundle",
     "version": "0.1.0",
     "license": "MIT",
-    "description": "Alpine.js 환경에서 클릭, 네비게이션 훅 및 로딩 화면 관리 라이브러리",
+    "description": "Alpine.js 환경에서 클릭, 내비게이션 훅 및 로딩 화면 관리 라이브러리",
     "main": "dist/hooks-bundle.js",
     "scripts": {
         "build": "node build.js",

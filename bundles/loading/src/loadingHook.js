@@ -14,15 +14,6 @@ const LoadingHook = (function () {
     let debugMode = false;
 
     /**
-     * 디버그 로깅 함수
-     */
-    function log(...args) {
-        if (debugMode) {
-            console.log('[LoadingHook]', ...args);
-        }
-    }
-
-    /**
      * 로딩 훅 초기화
      * @param {Object} options 초기화 옵션
      * @param {boolean} options.appendToBody DOM에 자동 추가 여부
@@ -33,7 +24,6 @@ const LoadingHook = (function () {
         if (isInitialized) return loadingElement;
 
         debugMode = options.debug;
-        log('Initializing loading hook');
 
         // 이미 DOM에 있는지 확인
         loadingElement = document.getElementById('hooks-fullscreen-loading');
@@ -46,13 +36,11 @@ const LoadingHook = (function () {
 
             if (options.appendToBody) {
                 document.body.appendChild(loadingElement);
-                log('Loading element appended to body');
             }
         }
 
         // 트랜지션 속성 확인
         const computedStyle = window.getComputedStyle(loadingElement);
-        log('Loading element transition:', computedStyle.transition);
 
         isInitialized = true;
         return loadingElement;
@@ -65,8 +53,6 @@ const LoadingHook = (function () {
     function show(delay = 0) {
         if (!isInitialized) init();
         if (isVisible) return;
-
-        log('Show loading requested', delay > 0 ? `with ${delay}ms delay` : 'immediately');
 
         // 이전 타이머 취소
         clearTimeout(hideTimer);
@@ -82,7 +68,6 @@ const LoadingHook = (function () {
                 // 다음 프레임에서 active 클래스 추가
                 requestAnimationFrame(() => {
                     loadingElement.classList.add('active');
-                    log('Loading screen visible');
                 });
             }
         };
@@ -101,15 +86,13 @@ const LoadingHook = (function () {
     function hide(delay = 0) {
         if (!isInitialized || !isVisible) return;
 
-        log('Hide loading requested', delay > 0 ? `with ${delay}ms delay` : 'immediately');
-
         // 페이지 전환 중인지 확인
         const isNavigating = document.visibilityState === 'hidden' ||
             document.readyState === 'unloading';
 
         // 페이지 전환 중이면 숨기지 않음
         if (isNavigating) {
-            log('Navigation in progress, keeping loading screen visible');
+            // console.log('Navigation in progress, keeping loading screen visible');
             return;
         }
 
@@ -121,13 +104,11 @@ const LoadingHook = (function () {
             if (loadingElement) {
                 // active 클래스 제거
                 loadingElement.classList.remove('active');
-                log('Loading screen hidden');
 
                 // 트랜지션 완료 후 처리
                 const onTransitionEnd = () => {
                     isVisible = false;
                     loadingElement.removeEventListener('transitionend', onTransitionEnd);
-                    log('Loading transition completed');
                 };
 
                 loadingElement.addEventListener('transitionend', onTransitionEnd);
@@ -157,10 +138,8 @@ const LoadingHook = (function () {
 
         try {
             show(showDelay);
-            log('Async operation started');
             return await Promise.resolve(callback());
         } finally {
-            log('Async operation completed');
             hide(hideDelay);
         }
     }

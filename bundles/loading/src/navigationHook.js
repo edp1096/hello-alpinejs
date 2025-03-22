@@ -2,7 +2,7 @@
 import LoadingHook from './loadingHook';
 
 /**
- * 네비게이션(뒤로가기/앞으로가기) 이벤트 감지 및 처리를 위한 훅
+ * 내비게이션(뒤로가기/앞으로가기) 이벤트 감지 및 처리를 위한 훅
  */
 const NavigationHook = (function () {
     const navHooks = [];
@@ -22,14 +22,7 @@ const NavigationHook = (function () {
     let lastHash = '';
 
     /**
-     * 디버그 로깅 함수
-     */
-    function log(...args) {
-        console.log('[NavigationHook]', ...args);
-    }
-
-    /**
-     * 네비게이션 훅 초기화
+     * 내비게이션 훅 초기화
      */
     function init() {
         if (initialized) return;
@@ -86,7 +79,7 @@ const NavigationHook = (function () {
         lastVisibilityState = document.visibilityState;
 
         initialized = true;
-        console.log('NavigationHook initialized');
+        // console.log('NavigationHook initialized');
     }
 
     /**
@@ -98,13 +91,13 @@ const NavigationHook = (function () {
         lastSearch = location.search;
         lastHash = location.hash;
 
-        // 디버깅용
-        console.log('URL info saved:', {
-            url: lastUrl,
-            pathname: lastPathname,
-            search: lastSearch,
-            hash: lastHash
-        });
+        // // 디버깅용
+        // console.log('URL info saved:', {
+        //     url: lastUrl,
+        //     pathname: lastPathname,
+        //     search: lastSearch,
+        //     hash: lastHash
+        // });
     }
 
     /**
@@ -127,14 +120,14 @@ const NavigationHook = (function () {
                 currentHash !== lastHash
         };
 
-        // 디버깅용
-        if (changes.url) {
-            console.log('URL changes detected:', {
-                from: lastUrl,
-                to: currentUrl,
-                changes
-            });
-        }
+        // // 디버깅용
+        // if (changes.url) {
+        //     console.log('URL changes detected:', {
+        //         from: lastUrl,
+        //         to: currentUrl,
+        //         changes
+        //     });
+        // }
 
         return changes;
     }
@@ -199,10 +192,7 @@ const NavigationHook = (function () {
      * @param {HashChangeEvent} event 이벤트 객체
      */
     function handleHashChange(event) {
-        console.log('HashChange event detected', {
-            oldURL: event.oldURL,
-            newURL: event.newURL
-        });
+        // console.log('HashChange event detected', { oldURL: event.oldURL, newURL: event.newURL });
 
         // 해시만 변경된 경우 (페이지 콘텐츠는 변경되지 않음)
         const oldUrlObj = new URL(event.oldURL);
@@ -240,14 +230,14 @@ const NavigationHook = (function () {
      * @param {PopStateEvent} event 이벤트 객체
      */
     function handlePopState(event) {
-        console.log('PopState event detected');
+        // console.log('PopState event detected');
 
         // URL 변경 감지 및 종류 구분
         const changes = detectUrlChanges();
 
         // 해시만 변경된 경우는 가벼운 처리
         if (changes.hashOnly) {
-            console.log('Hash-only change detected, lightweight handling');
+            // console.log('Hash-only change detected, lightweight handling');
             triggerNavHooks(event, {
                 type: 'navigation',
                 action: 'popstate-hash',
@@ -260,7 +250,7 @@ const NavigationHook = (function () {
             return;
         }
 
-        // 여기서부터는 실제 네비게이션 이벤트
+        // 여기서부터는 실제 내비게이션 이벤트
         isLoadingShown = true;
         isNavigating = true;
 
@@ -277,7 +267,7 @@ const NavigationHook = (function () {
         // 방법 1: setTimeout으로 지연 처리
         setTimeout(() => {
             if (isLoadingShown) {
-                console.log('PopState completed (timeout)');
+                // console.log('PopState completed (timeout)');
                 triggerNavHooks(event, {
                     type: 'navigation',
                     action: 'popstate-completed',
@@ -291,7 +281,7 @@ const NavigationHook = (function () {
         // 방법 2: DOMContentLoaded 또는 load 이벤트 활용
         const completeHandler = () => {
             if (isLoadingShown) {
-                console.log('PopState completed (DOMContentLoaded)');
+                // console.log('PopState completed (DOMContentLoaded)');
                 triggerNavHooks(event, {
                     type: 'navigation',
                     action: 'popstate-completed',
@@ -318,7 +308,7 @@ const NavigationHook = (function () {
      * 페이지 이탈 시 처리
      */
     function handleBeforeUnload(event) {
-        // 페이지 이탈 시 네비게이션 중임을 표시
+        // 페이지 이탈 시 내비게이션 중임을 표시
         isNavigating = true;
 
         // 로딩 화면 활성화 확인만 하고 추가 처리는 하지 않음
@@ -327,10 +317,10 @@ const NavigationHook = (function () {
                 LoadingHook &&
                 typeof LoadingHook.isActive === 'function') {
 
-                // 로딩 중이면 페이지 전환 중임을 표시
-                if (LoadingHook.isActive()) {
-                    console.log('Navigation in progress with active loading screen');
-                }
+                // // 로딩 중이면 페이지 전환 중임을 표시
+                // if (LoadingHook.isActive()) {
+                //     console.log('Navigation in progress with active loading screen');
+                // }
             }
         } catch (e) {
             console.warn('Error in beforeunload handler:', e);
@@ -347,17 +337,17 @@ const NavigationHook = (function () {
 
         // 너무 빠른 연속 이벤트는 무시 (100ms 이내)
         if (timeSinceLastChange < 100) {
-            console.log('Ignoring too frequent visibility change');
+            // console.log('Ignoring too frequent visibility change');
             return;
         }
 
         // 이전 상태와 동일하면 무시
         if (document.visibilityState === lastVisibilityState) {
-            console.log('Ignoring duplicate visibility state:', document.visibilityState);
+            // console.log('Ignoring duplicate visibility state:', document.visibilityState);
             return;
         }
 
-        console.log('Visibility changed:', lastVisibilityState, '->', document.visibilityState);
+        // console.log('Visibility changed:', lastVisibilityState, '->', document.visibilityState);
         lastVisibilityState = document.visibilityState;
 
         if (document.visibilityState === 'visible') {
@@ -365,10 +355,10 @@ const NavigationHook = (function () {
                 // URL 변경 감지 및 종류 구분
                 const changes = detectUrlChanges();
 
-                // 해시만 변경된 경우는 네비게이션으로 처리하지 않음
+                // 해시만 변경된 경우는 내비게이션으로 처리하지 않음
                 if (changes.url && !changes.hashOnly) {
                     // 실제 URL이 변경된 경우 (해시 제외)
-                    console.log('Significant URL change detected during visibility change');
+                    // console.log('Significant URL change detected during visibility change');
                     triggerNavHooks(new Event('synthetic'), {
                         type: 'navigation',
                         action: 'gesture',
@@ -377,7 +367,7 @@ const NavigationHook = (function () {
                     });
                 } else {
                     // URL 변경이 없거나 해시만 변경된 경우
-                    console.log('No significant URL change after visibility change');
+                    // console.log('No significant URL change after visibility change');
                     triggerNavHooks(new Event('synthetic'), {
                         type: 'navigation',
                         action: 'visibility-restored',
@@ -426,7 +416,7 @@ const NavigationHook = (function () {
                     // 짧은 지연 후 상태 확인
                     setTimeout(() => {
                         if (history.state !== currentState) {
-                            console.log('Swipe navigation detected');
+                            // console.log('Swipe navigation detected');
                             triggerNavHooks(new Event('synthetic'), {
                                 type: 'navigation',
                                 action: 'swipe',
@@ -440,12 +430,12 @@ const NavigationHook = (function () {
     }
 
     /**
-     * 등록된 모든 네비게이션 훅 실행
+     * 등록된 모든 내비게이션 훅 실행
      * @param {Event} event 이벤트 객체
      * @param {Object} info 추가 정보
      */
     function triggerNavHooks(event, info) {
-        console.log('Triggering navigation hooks:', info.action);
+        // console.log('Triggering navigation hooks:', info.action);
         for (const hook of navHooks) {
             try {
                 hook(event, info);
@@ -456,7 +446,7 @@ const NavigationHook = (function () {
     }
 
     /**
-     * 네비게이션 훅 추가
+     * 내비게이션 훅 추가
      * @param {Function} callback 콜백 함수
      */
     function addHook(callback) {
@@ -471,7 +461,7 @@ const NavigationHook = (function () {
     }
 
     /**
-     * 네비게이션 훅 제거
+     * 내비게이션 훅 제거
      * @param {Function} callback 제거할 콜백 함수
      */
     function removeHook(callback) {
@@ -496,9 +486,9 @@ const NavigationHook = (function () {
                     Object.defineProperty(window.Location.prototype, 'search', {
                         get: originalSearch.get,
                         set: function (value) {
-                            console.log('Location.search intercepted:', value);
+                            // console.log('Location.search intercepted:', value);
 
-                            // 네비게이션 훅 트리거
+                            // 내비게이션 훅 트리거
                             triggerNavHooks(new Event('synthetic'), {
                                 type: 'navigation',
                                 action: 'location-search',
@@ -515,7 +505,7 @@ const NavigationHook = (function () {
                         },
                         configurable: true
                     });
-                    console.log('Location.search hooked successfully');
+                    // console.log('Location.search hooked successfully');
                 } catch (err) {
                     console.warn('Failed to hook location.search, using alternative method', err);
                     // 대체 방법: 이벤트 감지로 대체
@@ -530,9 +520,9 @@ const NavigationHook = (function () {
                     Object.defineProperty(window.Location.prototype, 'href', {
                         get: originalHref.get,
                         set: function (value) {
-                            console.log('Location.href intercepted:', value);
+                            // console.log('Location.href intercepted:', value);
 
-                            // 네비게이션 훅 트리거
+                            // 내비게이션 훅 트리거
                             triggerNavHooks(new Event('synthetic'), {
                                 type: 'navigation',
                                 action: 'location-href',
@@ -549,7 +539,7 @@ const NavigationHook = (function () {
                         },
                         configurable: true
                     });
-                    console.log('Location.href hooked successfully');
+                    // console.log('Location.href hooked successfully');
                 } catch (err) {
                     console.warn('Failed to hook location.href, using alternative method', err);
                     // 대체 방법: 이벤트 감지로 대체
@@ -562,9 +552,9 @@ const NavigationHook = (function () {
                 const originalReplace = window.Location.prototype.replace;
                 if (originalReplace) {
                     window.Location.prototype.replace = function (url) {
-                        console.log('location.replace intercepted:', url);
+                        // console.log('location.replace intercepted:', url);
 
-                        // 네비게이션 훅 트리거
+                        // 내비게이션 훅 트리거
                         triggerNavHooks(new Event('synthetic'), {
                             type: 'navigation',
                             action: 'location-replace',
@@ -579,7 +569,6 @@ const NavigationHook = (function () {
 
                         return result;
                     };
-                    console.log('location.replace hooked successfully');
                 }
             } catch (err) {
                 console.warn('Failed to hook location.replace', err);
@@ -590,9 +579,9 @@ const NavigationHook = (function () {
                 const originalAssign = window.Location.prototype.assign;
                 if (originalAssign) {
                     window.Location.prototype.assign = function (url) {
-                        console.log('location.assign intercepted:', url);
+                        // console.log('location.assign intercepted:', url);
 
-                        // 네비게이션 훅 트리거
+                        // 내비게이션 훅 트리거
                         triggerNavHooks(new Event('synthetic'), {
                             type: 'navigation',
                             action: 'location-assign',
@@ -607,7 +596,6 @@ const NavigationHook = (function () {
 
                         return result;
                     };
-                    console.log('location.assign hooked successfully');
                 }
             } catch (err) {
                 console.warn('Failed to hook location.assign', err);
@@ -624,7 +612,7 @@ const NavigationHook = (function () {
  * (속성 재정의가 실패한 경우 사용)
  */
     function setupLocationChangeDetection() {
-        console.log('Setting up alternative location change detection');
+        // console.log('Setting up alternative location change detection');
 
         // MutationObserver를 통한 body 변경 감지
         // 페이지 변경의 간접적인 감지 방법
@@ -633,7 +621,7 @@ const NavigationHook = (function () {
             const changes = detectUrlChanges();
 
             if (changes.url && !changes.hashOnly) {
-                console.log('URL change detected via MutationObserver');
+                // console.log('URL change detected via MutationObserver');
                 triggerNavHooks(new Event('synthetic'), {
                     type: 'navigation',
                     action: 'url-changed',
@@ -645,7 +633,7 @@ const NavigationHook = (function () {
                 saveCurrentState();
                 saveUrlInfo();
             } else if (changes.hash) {
-                console.log('Hash change detected via MutationObserver');
+                // console.log('Hash change detected via MutationObserver');
                 triggerNavHooks(new Event('synthetic'), {
                     type: 'navigation',
                     action: 'url-changed',
@@ -676,8 +664,8 @@ const NavigationHook = (function () {
                 target.closest('form') ||
                 target.classList.contains('button')) {
 
-                // URL 변경 가능성이 있는 클릭 감지
-                console.log('Potential navigation click detected');
+                // // URL 변경 가능성이 있는 클릭 감지
+                // console.log('Potential navigation click detected');
 
                 // 현재 URL 정보 저장
                 const currentUrl = location.href;
@@ -689,7 +677,7 @@ const NavigationHook = (function () {
                     const newChanges = detectUrlChanges();
 
                     if (newChanges.url && !newChanges.hashOnly) {
-                        console.log('URL changed after click');
+                        // console.log('URL changed after click');
                         triggerNavHooks(new Event('synthetic'), {
                             type: 'navigation',
                             action: 'url-changed-after-click',
@@ -701,7 +689,7 @@ const NavigationHook = (function () {
                         saveCurrentState();
                         saveUrlInfo();
                     } else if (newChanges.hash) {
-                        console.log('Hash changed after click');
+                        // console.log('Hash changed after click');
                         triggerNavHooks(new Event('synthetic'), {
                             type: 'navigation',
                             action: 'url-changed-after-click',
@@ -718,8 +706,6 @@ const NavigationHook = (function () {
 
         // Alpine.js 이벤트 감지 (특별 처리)
         if (window.Alpine || document.querySelector('[x-data]')) {
-            console.log('Alpine.js detected, setting up special handlers');
-
             // Alpine.js 초기화 이벤트 감지
             document.addEventListener('alpine:init', () => {
                 // Alpine 이벤트 감지 설정
@@ -744,9 +730,6 @@ const NavigationHook = (function () {
             // 특정 요소에 대한 감시
             document.querySelectorAll('[x-on\\:click], [\\@click]').forEach(el => {
                 el.addEventListener('click', (event) => {
-                    // 클릭 시 URL 변경 가능성 감지
-                    console.log('Alpine element clicked');
-
                     // 현재 URL 정보 저장
                     const beforeUrlInfo = {
                         url: location.href,
@@ -771,7 +754,7 @@ const NavigationHook = (function () {
 
                         if (beforeUrlInfo.url !== afterUrlInfo.url) {
                             if (!hashOnly) {
-                                console.log('URL changed after Alpine event');
+                                // console.log('URL changed after Alpine event');
                                 triggerNavHooks(new Event('synthetic'), {
                                     type: 'navigation',
                                     action: 'alpine-navigation',
@@ -782,7 +765,7 @@ const NavigationHook = (function () {
 
                                 saveCurrentState();
                             } else {
-                                console.log('Hash changed after Alpine event');
+                                // console.log('Hash changed after Alpine event');
                                 triggerNavHooks(new Event('synthetic'), {
                                     type: 'navigation',
                                     action: 'alpine-navigation',

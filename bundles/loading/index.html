@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UI Hooks 데모 - 로딩, 네비게이션, 클릭 훅</title>
+    <title>UI Hooks 데모 - 로딩, 내비게이션, 클릭 훅</title>
     <style>
         :root {
             --primary: #4361ee;
@@ -275,7 +275,7 @@
 <body data-hooks-auto>
     <header>
         <h1>UI Hooks 데모</h1>
-        <p>로딩, 네비게이션, 클릭 이벤트 자동 감지 및 로딩 화면 표시 테스트</p>
+        <p>로딩, 내비게이션, 클릭 이벤트 자동 감지 및 로딩 화면 표시 테스트</p>
     </header>
 
     <!-- 1. 기본 로딩 테스트 -->
@@ -316,10 +316,10 @@
         </div>
     </div>
 
-    <!-- 3. 네비게이션 테스트 -->
+    <!-- 3. 내비게이션 테스트 -->
     <div class="card">
         <div class="card-header">
-            <span>3. 네비게이션 API 테스트</span>
+            <span>3. 내비게이션 API 테스트</span>
             <span class="badge">NavigationHook</span>
         </div>
 
@@ -381,7 +381,7 @@
             <div class="log-filters">
                 <button onclick="filterLogs('all')" class="btn-light">전체</button>
                 <button onclick="filterLogs('loading')" class="btn-info">로딩 이벤트</button>
-                <button onclick="filterLogs('navigation')" class="btn-success">네비게이션</button>
+                <button onclick="filterLogs('navigation')" class="btn-success">내비게이션</button>
                 <button onclick="filterLogs('click')" class="btn-warning">클릭</button>
             </div>
             <button onclick="clearLogs()" class="btn-danger">로그 지우기</button>
@@ -469,7 +469,7 @@
             window.location.search = 'search=test&time=' + Date.now();
         }
 
-        // 3. 네비게이션 테스트 함수
+        // 3. 내비게이션 테스트 함수
         function updateUrlDisplay() {
             document.getElementById('current-url').textContent = window.location.href;
         }
@@ -583,9 +583,9 @@
                 // 모든 a 태그에 로딩 화면 자동 표시 설정 (외부 링크 제외)
                 Hooks.autoLoading('a:not([target="_blank"])');
 
-                // 네비게이션 이벤트 로깅
+                // 내비게이션 이벤트 로깅
                 Hooks.navigation.addHook((event, info) => {
-                    addLog('navigation', `네비게이션 이벤트: ${info.action}`);
+                    addLog('navigation', `내비게이션 이벤트: ${info.action}`);
                 });
 
                 // 클릭 이벤트 로깅
