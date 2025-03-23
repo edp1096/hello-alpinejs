@@ -80,6 +80,31 @@ const htmlImportPlugin = {
     }
 };
 
+// SVG 플러그인 추가
+const svgPlugin = {
+    name: 'svg-import',
+    setup(build) {
+        build.onLoad({ filter: /\.svg$/ }, async (args) => {
+            const svg = await fs.promises.readFile(args.path, 'utf8');
+
+            // SVG를 최소화
+            const minifiedSvg = svg
+                .replace(/\s+/g, ' ')
+                .replace(/>\s+</g, '><')
+                .replace(/<!--.*?-->/g, '')
+                .trim();
+
+            // URL 인코딩하여 데이터 URI로 변환
+            const dataUri = `data:image/svg+xml,${encodeURIComponent(minifiedSvg)}`;
+
+            // JavaScript 모듈로 내보내기
+            const contents = `export default "${dataUri}";`;
+
+            return { contents, loader: 'js' };
+        });
+    }
+};
+
 const emptyCssPlugin = {
     name: 'empty-css',
     setup(build) {
@@ -104,6 +129,7 @@ async function buildJS() {
             target: ['es2020'],
             plugins: [
                 htmlImportPlugin,
+                svgPlugin,     // SVG 플러그인 추가
                 emptyCssPlugin
             ],
             external: ['alpinejs'],
@@ -257,7 +283,7 @@ async function runDevServer() {
         });
 
         // Watch files setting
-        const globs = await fg(['src/**/*.js', 'src/**/*.html', 'src/**/*.scss', 'index.html']);
+        const globs = await fg(['src/**/*.js', 'src/**/*.html', 'src/**/*.scss', 'src/**/*.svg', 'index.html']);
         const watcher = chokidar.watch(globs, {
             ignored: /(^|[\/\\])\../, // Ignore hidden files
             persistent: true

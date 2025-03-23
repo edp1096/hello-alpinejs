@@ -1,4 +1,31 @@
 // src/toast.scss
+
+// 색상 변수 정의
+$toast-success-color: #4CAF50;
+$toast-error-color: #F44336;
+$toast-warning-color: #FFC107;
+$toast-info-color: #2196F3;
+$toast-close-color: #999;
+$toast-close-hover-color: #333;
+
+// 아이콘 기본 스타일
+@mixin icon-base {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    margin-top: 2px;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+}
+
 .toast-wrapper {
     position: fixed;
     z-index: 9999;
@@ -71,34 +98,62 @@
 
     // 토스트 타입
     &.success {
-        border-left: 4px solid #4CAF50;
+        border-left: 4px solid $toast-success-color;
 
         .toast-icon {
-            color: #4CAF50;
+            @include icon-base;
+            background-color: $toast-success-color;
+            mask-image: var(--icon-check);
+            -webkit-mask-image: var(--icon-check);
+        }
+
+        .toast-progress {
+            background-color: $toast-success-color;
         }
     }
 
     &.error {
-        border-left: 4px solid #F44336;
+        border-left: 4px solid $toast-error-color;
 
         .toast-icon {
-            color: #F44336;
+            @include icon-base;
+            background-color: $toast-error-color;
+            mask-image: var(--icon-error);
+            -webkit-mask-image: var(--icon-error);
+        }
+
+        .toast-progress {
+            background-color: $toast-error-color;
         }
     }
 
     &.warning {
-        border-left: 4px solid #FFC107;
+        border-left: 4px solid $toast-warning-color;
 
         .toast-icon {
-            color: #FFC107;
+            @include icon-base;
+            background-color: $toast-warning-color;
+            mask-image: var(--icon-warning);
+            -webkit-mask-image: var(--icon-warning);
+        }
+
+        .toast-progress {
+            background-color: $toast-warning-color;
         }
     }
 
     &.info {
-        border-left: 4px solid #2196F3;
+        border-left: 4px solid $toast-info-color;
 
         .toast-icon {
-            color: #2196F3;
+            @include icon-base;
+            background-color: $toast-info-color;
+            mask-image: var(--icon-info);
+            -webkit-mask-image: var(--icon-info);
+        }
+
+        .toast-progress {
+            background-color: $toast-info-color;
         }
     }
 }
@@ -106,12 +161,6 @@
 .toast-content {
     display: flex;
     align-items: flex-start;
-}
-
-.toast-icon {
-    font-size: 20px;
-    margin-right: 12px;
-    margin-top: 2px;
 }
 
 .toast-message {
@@ -134,15 +183,23 @@
     position: absolute;
     top: 12px;
     right: 12px;
-    background: none;
+    width: 16px;
+    height: 16px;
+    background-color: $toast-close-color;
+    mask-image: var(--icon-close);
+    -webkit-mask-image: var(--icon-close);
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
     border: none;
     cursor: pointer;
-    color: #999;
     padding: 2px;
-    font-size: 16px;
 
     &:hover {
-        color: #333;
+        background-color: $toast-close-hover-color;
     }
 }
 
@@ -151,8 +208,7 @@
     bottom: 0;
     left: 0;
     height: 3px;
-    background-color: currentColor;
-    opacity: 0.3;
+    opacity: 0.5;
 }
 
 // 애니메이션

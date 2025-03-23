@@ -2,6 +2,9 @@
 import toastTemplate from './toast.html';
 import './toast.scss';
 
+// 합쳐진 아이콘 모듈 가져오기
+import icons from './icons';
+
 export function registerToast(config = {}) {
     if (!window.Alpine) {
         console.error('Alpine.js is not loaded. Please load Alpine.js first.');
@@ -53,6 +56,9 @@ export function registerToast(config = {}) {
 
     window.Alpine.data('toast', () => {
         return {
+            // 아이콘 객체
+            icons,
+
             // 위치별로 토스트 아이템을 그룹화
             itemGroups: {
                 'top-right': [],
@@ -67,7 +73,19 @@ export function registerToast(config = {}) {
             maxToasts: config.maxToasts || 5,
             toastIdCounter: 0,
 
+            // 아이콘 URL 얻기
+            getIconUrl(type) {
+                return this.icons[type] || '';
+            },
+
             init() {
+                // CSS 변수로 아이콘 URL 설정
+                document.documentElement.style.setProperty('--icon-check', `url('${this.icons.check}')`);
+                document.documentElement.style.setProperty('--icon-error', `url('${this.icons.error}')`);
+                document.documentElement.style.setProperty('--icon-warning', `url('${this.icons.warning}')`);
+                document.documentElement.style.setProperty('--icon-info', `url('${this.icons.info}')`);
+                document.documentElement.style.setProperty('--icon-close', `url('${this.icons.close}')`);
+
                 // 요소의 ID를 확인하고 해당 설정 가져오기
                 if (this.$el && this.$el.closest('my-toast') && this.$el.closest('my-toast').id) {
                     const customConfig = window.Alpine.store('toastConfig_' + this.$el.closest('my-toast').id);
@@ -253,13 +271,6 @@ if (typeof document != 'undefined') {
                 document.body.appendChild(globalToast);
                 registerToast();
             }
-
-            // // 커스텀 태그 정의 알림
-            // if (typeof customElements !== 'undefined') {
-            //     customElements.whenDefined('my-toast').then(() => {
-            //         console.log('my-toast custom element defined');
-            //     });
-            // }
         }
     });
 }
