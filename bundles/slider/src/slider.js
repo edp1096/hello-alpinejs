@@ -62,6 +62,11 @@ export function registerSlider(config = {}) {
                     localConfig.noFillet = this.getAttribute('no-fillet') !== 'false';
                 }
 
+                // nofillet mobile
+                if (this.hasAttribute('no-fillet-mobile')) {
+                    localConfig.noFilletMobile = this.getAttribute('no-fillet-mobile') !== 'false';
+                }
+
                 // ratio
                 if (this.hasAttribute('ratio')) {
                     localConfig.ratio = this.getAttribute('ratio');
@@ -160,6 +165,7 @@ export function registerSlider(config = {}) {
             isMobile: false,
             mobileRatio: '1/1',
             customMobileRatioSelected: false,
+            noFilletMobile: false,
 
             init() {
                 // 모바일 환경 확인
@@ -185,9 +191,10 @@ export function registerSlider(config = {}) {
                         if (sliderConfig.showIndicators !== undefined) this.showIndicators = sliderConfig.showIndicators;
                         if (sliderConfig.showControl !== undefined) this.showControl = sliderConfig.showControl;
                         if (sliderConfig.noFillet !== undefined) this.noFillet = sliderConfig.noFillet;
-                        if (sliderConfig.useSwipe !== undefined) this.useSwipe = sliderConfig.useSwipe;
+                        if (sliderConfig.noFilletMobile) this.noFilletMobile = sliderConfig.noFilletMobile;
                         if (sliderConfig.ratio) this.ratio = sliderConfig.ratio;
                         if (sliderConfig.mobileRatio) this.mobileRatio = sliderConfig.mobileRatio;
+                        if (sliderConfig.useSwipe !== undefined) this.useSwipe = sliderConfig.useSwipe;
 
                         // 이미지 설정 (가장 중요!)
                         if (sliderConfig.images && Array.isArray(sliderConfig.images)) {

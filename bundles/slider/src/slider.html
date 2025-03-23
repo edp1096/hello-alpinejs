@@ -21,6 +21,10 @@
                     <input type="checkbox" x-model="noFillet">
                     <span>각진 모서리 사용</span>
                 </label>
+                <label class="toggle-switch">
+                    <input type="checkbox" x-model="noFilletMobile">
+                    <span>각진 모서리 사용(모바일)</span>
+                </label>
             </div>
 
             <div class="option-group">
@@ -135,7 +139,7 @@
         </div>
     </template>
 
-    <div class="carousel-container" :class="{ 'no-fillet': noFillet }">
+    <div class="carousel-container" :class="{ 'no-fillet': noFillet, 'no-fillet-mobile': noFilletMobile }">
         <div class="carousel-inner" :style="transitionType == 'slide' ? 
                     `transform: translateX(${-currentIndex * 100}%); transition: transform ${transitionDuration}s ease;` : 
                     ''" :class="{'fade-transition': transitionType == 'fade'}">

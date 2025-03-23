@@ -97,8 +97,11 @@
         @media (max-width: 767px) {
             max-width: 100%;
             margin: 0;
-            // border-radius: 0; // 모바일에서는 모서리를 없앰
             box-shadow: none; // 모바일에서는 그림자 제거
+
+            &.no-fillet-mobile {
+                border-radius: 0px;
+            }
 
             // ratio가 변경되었을 때 트랜지션이 자연스럽게 보이도록 오버플로우 처리
             &::before {
