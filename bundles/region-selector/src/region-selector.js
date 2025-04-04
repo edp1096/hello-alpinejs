@@ -310,6 +310,54 @@ export function registerRegionSelector(config = {}) {
             return regionSelectorTemplate;
         },
 
+        // 문자열 기반으로 지역 선택 설정하는 메서드
+        setRegionByName(regionName, cityName) {
+            // DOM에서 region-selector 요소 찾기
+            const selectorElements = document.querySelectorAll('region-selector');
+            if (!selectorElements.length) return false;
+
+            // 도시와 지역 데이터 가져오기
+            const cities = config.cities || [];
+            const districts = config.districts || [];
+
+            // 도시명으로 도시 객체 찾기
+            const city = cities.find(c => c.name === regionName);
+            if (!city) return false; // 지역이 없으면 적용하지 않음
+
+            // 도시명이 제공된 경우
+            if (cityName) {
+                // 지역명으로 지역 객체 찾기
+                let district = districts.find(d =>
+                    d.cityId === city.id &&
+                    (d.name === cityName || d.name.includes(cityName))
+                );
+
+                // '전체' 지역 처리
+                if (!district && cityName === '전체') {
+                    district = {
+                        id: 'all',
+                        name: city.name + ' 전체',
+                        count: city.count
+                    };
+                }
+
+                // 지역명이 제공되었는데 일치하는 도시가 없으면 아무것도 적용하지 않음
+                if (!district) return false;
+
+                // 모든 selector에 지역과 도시 적용
+                selectorElements.forEach(selector => {
+                    selector.setSelectedRegion(city, district);
+                });
+            } else {
+                // 도시명이 제공되지 않은 경우 지역만 적용
+                selectorElements.forEach(selector => {
+                    selector.setSelectedRegion(city, null);
+                });
+            }
+
+            return true;
+        },
+
         // 커스텀 엘리먼트 등록 메서드 노출
         registerCustomElement
     };
